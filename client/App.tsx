@@ -36,6 +36,10 @@ const App = () => (
             <Route path="/request/cellphone" element={<RequestSelect />} />
             <Route path="/request/office-supply" element={<RequestSelect />} />
             <Route path="/requests" element={<MyRequests />} />
+            <Route path="/requests/pending" element={<MyRequests />} />
+            <Route path="/requests/approved" element={<MyRequests />} />
+            <Route path="/requests/returned" element={<MyRequests />} />
+            <Route path="/requests/draft" element={<MyRequests />} />
             <Route path="/approvals" element={<Approvals />} />
             <Route path="/admin" element={<Admin />} />
             <Route path="/ga/requests" element={<GARequestManagement />} />
