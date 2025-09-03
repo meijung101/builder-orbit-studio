@@ -47,6 +47,15 @@ function formatDate(iso: string) {
   }
 }
 
+function categoryFromPath(path: string): string | null {
+  if (path.includes("/ga/requests/business-card")) return "Business Card";
+  if (path.includes("/ga/requests/office-supply")) return "Office Supply";
+  if (path.includes("/ga/requests/trip")) return "Trip";
+  if (path.includes("/ga/requests/mail")) return "Mail";
+  if (path.includes("/ga/requests/expense")) return "Expense Reimbursement";
+  return null;
+}
+
 export default function GARequestManagement() {
   const navigate = useNavigate();
   const [query, setQuery] = useState("");
