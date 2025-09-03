@@ -32,7 +32,7 @@ export default function RequestTypeDialog({ open, onOpenChange }: RequestTypeDia
       { key: "trip-request", label: "Trip Request", icon: PlaneTakeoff, to: "/request/new" },
       { key: "expense", label: "Expense Reimbursement", icon: Receipt, to: "/request/expense" },
       { key: "bereavement", label: "Bereavement", icon: HeartPulse, to: "/request/bereavement" },
-      { key: "mail", label: "Mail", icon: Mail, to: "/request/mail" },
+      { key: "mail", label: "Shipping Request", icon: Mail, to: "/request/mail" },
       { key: "cellphone", label: "Cellphone", icon: Phone, to: "/request/cellphone" },
       { key: "office-supply", label: "Office Supply", icon: Package, to: "/request/office-supply" },
       { key: "pool-car", label: "Pool Car Request", icon: CarFront, to: "#", disabled: true },
