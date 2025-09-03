@@ -122,6 +122,7 @@ export default function ShippingRequest() {
     recipientCompany: "",
     recipientAddress1: "",
     recipientAddress2: "",
+    recipientCountry: "United States",
     recipientCity: "",
     recipientState: "",
     recipientZipCode: "",
