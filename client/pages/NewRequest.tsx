@@ -351,14 +351,17 @@ export default function NewRequest() {
 
   return (
     <div className="max-w-6xl mx-auto space-y-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">New Trip Request</h1>
-          <p className="text-gray-600">Create a new business trip request</p>
+      <div className="bg-primary text-white p-6 rounded-lg shadow">
+        <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center gap-3">
+            <PlaneTakeoff className="w-8 h-8" />
+            <h1 className="text-2xl font-bold">New Trip Request</h1>
+          </div>
+          <div className="text-sm text-white/80">
+            Document #: <span className="font-mono">BIZ-{String(Date.now()).slice(-3)}</span>
+          </div>
         </div>
-        <div className="text-sm text-gray-500">
-          Document #: <span className="font-mono">BIZ-{String(Date.now()).slice(-3)}</span>
-        </div>
+        <p className="text-primary/20">Create a new business trip request</p>
       </div>
 
       {/* Trip Overview Section */}
