@@ -4,7 +4,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
-import { FileWarning2, CarFront, PlaneTakeoff, Receipt, HeartPulse, Mail, Phone } from "lucide-react";
+import { FileWarning, CarFront, PlaneTakeoff, Receipt, HeartPulse, Mail, Phone } from "lucide-react";
 
 export type RequestTypeKey =
   | "accident"
@@ -25,7 +25,7 @@ export default function RequestTypeDialog({ open, onOpenChange }: RequestTypeDia
 
   const items = useMemo(
     () => [
-      { key: "accident", label: "Accident Incident Report", icon: FileWarning2, to: "/request/accident" },
+      { key: "accident", label: "Accident Incident Report", icon: FileWarning, to: "/request/accident" },
       { key: "business-car", label: "Business Car", icon: CarFront, to: "/request/business-car" },
       { key: "trip-request", label: "Trip Request", icon: PlaneTakeoff, to: "/request/new" },
       { key: "expense", label: "Expense Reimbursement", icon: Receipt, to: "/request/expense" },
