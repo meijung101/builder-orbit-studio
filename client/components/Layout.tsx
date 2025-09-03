@@ -48,7 +48,7 @@ export default function Layout({ children }: LayoutProps) {
         <div className="fixed inset-0 bg-gray-900/80" onClick={() => setSidebarOpen(false)} />
         <div className="fixed inset-y-0 left-0 z-50 w-72 bg-white shadow-xl">
           <div className="flex h-16 items-center justify-between px-6 border-b">
-            <h1 className="text-xl font-bold text-primary">TripFlow</h1>
+            <h1 className="text-xl font-bold text-primary">HMGMA BPMS</h1>
             <Button variant="ghost" size="sm" onClick={() => setSidebarOpen(false)}>
               <X className="h-5 w-5" />
             </Button>
@@ -102,7 +102,7 @@ export default function Layout({ children }: LayoutProps) {
       <div className="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col">
         <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-white border-r px-6 pb-4">
           <div className="flex h-16 shrink-0 items-center border-b">
-            <h1 className="text-2xl font-bold text-primary">TripFlow</h1>
+            <h1 className="text-2xl font-bold text-primary">HMGMA BPMS</h1>
           </div>
           <nav className="flex flex-1 flex-col">
             <ul className="flex flex-1 flex-col gap-y-2">
@@ -168,7 +168,7 @@ export default function Layout({ children }: LayoutProps) {
           <Button variant="ghost" size="sm" onClick={() => setSidebarOpen(true)}>
             <Menu className="h-5 w-5" />
           </Button>
-          <h1 className="text-xl font-semibold text-primary">TripFlow</h1>
+          <h1 className="text-xl font-semibold text-primary">HMGMA BPMS</h1>
         </div>
 
         {/* Page content */}
