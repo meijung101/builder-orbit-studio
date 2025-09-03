@@ -193,7 +193,7 @@ export default function NewRequest() {
       flights: [
         ...travelers.find((t) => t.id === travelerId)!.flights,
         {
-          id: `${Date.now()}-f`;
+          id: `${Date.now()}-f`,
           departureDateTime: null,
           arrivalDateTime: null,
           from: "",
@@ -740,7 +740,7 @@ export default function NewRequest() {
                         <div className="col-span-2 font-medium text-gray-600">Total</div>
                         <div className="col-span-2" />
                         {traveler.perDiem.map((p) => (
-                          <>
+                          <div key={p.id} className="contents">
                             <div className="col-span-4">
                               <Input value={destinations.find((d) => d.value === p.location)?.label || p.location} disabled />
                             </div>
@@ -760,7 +760,7 @@ export default function NewRequest() {
                             </div>
                             <div className="col-span-2 flex items-center">${(p.total || 0).toLocaleString()}</div>
                             <div className="col-span-2" />
-                          </>
+                          </div>
                         ))}
                         <div className="col-span-8 text-right font-semibold">Grand Total</div>
                         <div className="col-span-2 font-semibold">
