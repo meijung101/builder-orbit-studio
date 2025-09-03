@@ -85,13 +85,20 @@ export default function Index() {
           <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>
           <p className="text-gray-600">Welcome back! Here's what's happening with all requests</p>
         </div>
-        <div className="mt-4 sm:mt-0">
+        <div className="mt-4 sm:mt-0 flex items-center gap-3">
           <Link to="/request/select">
             <Button className="w-full sm:w-auto">
               <Plus className="h-4 w-4 mr-2" />
               New Request
             </Button>
           </Link>
+          <div className="flex items-center gap-3 rounded-md border bg-white px-3 py-2">
+            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-primary-foreground text-sm font-medium">JD</div>
+            <div className="hidden sm:block text-left text-sm">
+              <p className="font-medium text-gray-900">John Doe</p>
+              <p className="text-gray-500">Manager</p>
+            </div>
+          </div>
         </div>
       </div>
 
