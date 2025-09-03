@@ -11,6 +11,7 @@ import NewRequest from "./pages/NewRequest";
 import MyRequests from "./pages/MyRequests";
 import Approvals from "./pages/Approvals";
 import Admin from "./pages/Admin";
+import RequestSelect from "./pages/RequestSelect";
 import NotFound from "./pages/NotFound";
 
 
