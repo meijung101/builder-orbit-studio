@@ -38,8 +38,7 @@ export function WorkflowStepper({ steps, className }: WorkflowStepperProps) {
                     className={cn(
                       "h-8 w-8 rounded-full flex items-center justify-center ring-8 ring-white",
                       {
-                        "bg-primary text-primary-foreground": step.status === "completed",
-                        "bg-primary text-primary-foreground": step.status === "current",
+                        "bg-primary text-primary-foreground": step.status === "completed" || step.status === "current",
                         "bg-gray-200 text-gray-500": step.status === "pending",
                         "bg-red-500 text-white": step.status === "rejected",
                       }
