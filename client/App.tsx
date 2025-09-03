@@ -14,6 +14,7 @@ import Admin from "./pages/Admin";
 import RequestSelect from "./pages/RequestSelect";
 import Bereavement from "./pages/Bereavement";
 import NotFound from "./pages/NotFound";
+import GARequestManagement from "./pages/GARequestManagement";
 
 
 const App = () => (
