@@ -19,6 +19,7 @@ import OfficeSupplyStandard from "./pages/OfficeSupplyStandard";
 import OfficeSupplyNonStandard from "./pages/OfficeSupplyNonStandard";
 import NotFound from "./pages/NotFound";
 import GARequestManagement from "./pages/GARequestManagement";
+import AccidentIncident from "./pages/AccidentIncident";
 
 
 const App = () => (
@@ -32,7 +33,7 @@ const App = () => (
             <Route path="/" element={<Index />} />
             <Route path="/request/select" element={<RequestSelect />} />
             <Route path="/request/new" element={<NewRequest />} />
-            <Route path="/request/accident" element={<RequestSelect />} />
+            <Route path="/request/accident" element={<AccidentIncident />} />
             <Route path="/request/business-car" element={<RequestSelect />} />
             <Route path="/request/expense" element={<RequestSelect />} />
             <Route path="/request/bereavement" element={<Bereavement />} />
