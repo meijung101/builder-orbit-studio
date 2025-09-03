@@ -13,10 +13,9 @@ import Approvals from "./pages/Approvals";
 import Admin from "./pages/Admin";
 import NotFound from "./pages/NotFound";
 
-const queryClient = new QueryClient();
 
 const App = () => (
-  <QueryClientProvider client={queryClient}>
+  <>
     <TooltipProvider>
       <Toaster />
       <Sonner />
@@ -34,7 +33,7 @@ const App = () => (
         </Layout>
       </BrowserRouter>
     </TooltipProvider>
-  </QueryClientProvider>
+  </>
 );
 
 createRoot(document.getElementById("root")!).render(<App />);
