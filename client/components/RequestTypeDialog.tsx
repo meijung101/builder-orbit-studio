@@ -4,7 +4,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } f
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
-import { FileWarning, CreditCard, PlaneTakeoff, Receipt, HeartPulse, Mail, Phone } from "lucide-react";
+import { FileWarning, CreditCard, PlaneTakeoff, Receipt, HeartPulse, Mail, Phone, Package } from "lucide-react";
 
 export type RequestTypeKey =
   | "accident"
@@ -13,7 +13,8 @@ export type RequestTypeKey =
   | "expense"
   | "bereavement"
   | "mail"
-  | "cellphone";
+  | "cellphone"
+  | "office-supply";
 
 interface RequestTypeDialogProps {
   open: boolean;
@@ -32,6 +33,7 @@ export default function RequestTypeDialog({ open, onOpenChange }: RequestTypeDia
       { key: "bereavement", label: "Bereavement", icon: HeartPulse, to: "/request/bereavement" },
       { key: "mail", label: "Mail", icon: Mail, to: "/request/mail" },
       { key: "cellphone", label: "Cellphone", icon: Phone, to: "/request/cellphone" },
+      { key: "office-supply", label: "Office Supply", icon: Package, to: "/request/office-supply" },
     ],
     []
   );
