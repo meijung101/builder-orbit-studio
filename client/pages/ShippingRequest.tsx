@@ -391,7 +391,7 @@ export default function ShippingRequest() {
       </div>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">State/Province/Region *</label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">City *</label>
           <input
             type="text"
             value={formData.recipientCity}
@@ -401,7 +401,7 @@ export default function ShippingRequest() {
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">State *</label>
+          <label className="block text-sm font-medium text-gray-700 mb-2">State/Province/Region *</label>
           <input
             type="text"
             value={formData.recipientState}
