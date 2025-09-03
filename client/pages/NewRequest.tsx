@@ -355,9 +355,12 @@ export default function NewRequest() {
                     <div className="flex items-center gap-2">
                       <span>{t.passportName || t.name || `Traveler ${idx + 1}`}</span>
                       {travelers.length > 1 && (
-                        <button
-                          className="ml-1 rounded p-0.5 text-gray-400 hover:text-red-600"
+                        <span
+                          role="button"
+                          tabIndex={-1}
+                          className="ml-1 rounded p-0.5 text-gray-400 hover:text-red-600 cursor-pointer"
                           onClick={(e) => {
+                            e.preventDefault();
                             e.stopPropagation();
                             setTravelers((prev) => {
                               if (prev.length <= 1) return prev;
@@ -374,7 +377,7 @@ export default function NewRequest() {
                           aria-label={`Remove ${t.passportName || t.name || `Traveler ${idx + 1}`}`}
                         >
                           <X className="h-3.5 w-3.5" />
-                        </button>
+                        </span>
                       )}
                     </div>
                   </TabsTrigger>
