@@ -12,6 +12,7 @@ import MyRequests from "./pages/MyRequests";
 import Approvals from "./pages/Approvals";
 import Admin from "./pages/Admin";
 import RequestSelect from "./pages/RequestSelect";
+import ShippingRequest from "./pages/ShippingRequest";
 import Bereavement from "./pages/Bereavement";
 import OfficeSupplyIndex from "./pages/OfficeSupplyIndex";
 import OfficeSupplyStandard from "./pages/OfficeSupplyStandard";
@@ -35,7 +36,7 @@ const App = () => (
             <Route path="/request/business-car" element={<RequestSelect />} />
             <Route path="/request/expense" element={<RequestSelect />} />
             <Route path="/request/bereavement" element={<Bereavement />} />
-            <Route path="/request/mail" element={<RequestSelect />} />
+            <Route path="/request/mail" element={<ShippingRequest />} />
             <Route path="/request/office-supply" element={<OfficeSupplyIndex />} />
             <Route path="/request/office-supply/standard" element={<OfficeSupplyStandard />} />
             <Route path="/request/office-supply/non-standard" element={<OfficeSupplyNonStandard />} />
