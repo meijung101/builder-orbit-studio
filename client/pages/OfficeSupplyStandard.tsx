@@ -4,7 +4,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
-import { Combobox, ComboboxOption } from "@/components/ui/combobox";
 import { Badge } from "@/components/ui/badge";
 import { Search, ExternalLink, CheckCircle2 } from "lucide-react";
 
@@ -45,11 +44,7 @@ interface LineItem {
 export default function OfficeSupplyStandard() {
   const [query, setQuery] = useState("");
   const [lines, setLines] = useState<LineItem[]>([]);
-  const [selectedItem, setSelectedItem] = useState<string>("");
 
-  const options: ComboboxOption[] = useMemo(() =>
-    CATALOG.map((c) => ({ value: c.id, label: `${c.partNumber} — ${c.description} (${c.vendor})` })),
-  []);
 
   const filtered = useMemo(() => {
     if (!query) return CATALOG;
@@ -74,7 +69,6 @@ export default function OfficeSupplyStandard() {
         url: item.url,
       },
     ]);
-    setSelectedItem("");
   };
 
   const updateQty = (lineId: string, qty: number) => {
@@ -102,22 +96,10 @@ export default function OfficeSupplyStandard() {
           <CardDescription>Search part number or description. Includes Staples and Amazon.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
               <Input className="pl-9" placeholder="Search by part number or description" value={query} onChange={(e) => setQuery(e.target.value)} />
-            </div>
-            <div className="space-y-2">
-              <Label>Select Part Number</Label>
-              <Combobox
-                options={options}
-                value={selectedItem}
-                onValueChange={(val) => {
-                  setSelectedItem(val);
-                  if (val) addSelected(val);
-                }}
-                placeholder="Type to search parts"
-              />
             </div>
           </div>
 
