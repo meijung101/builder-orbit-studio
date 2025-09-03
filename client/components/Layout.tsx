@@ -262,21 +262,6 @@ export default function Layout({ children }: LayoutProps) {
             </ul>
           </nav>
           
-          {/* User section */}
-          <div className="border-t pt-4">
-            <div className="flex items-center gap-3 px-3 py-2">
-              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-primary-foreground text-sm font-medium">
-                JD
-              </div>
-              <div className="flex-1 text-sm">
-                <p className="font-medium text-gray-900">John Doe</p>
-                <p className="text-gray-500">Manager</p>
-              </div>
-              <Button variant="ghost" size="sm">
-                <LogOut className="h-4 w-4" />
-              </Button>
-            </div>
-          </div>
         </div>
       </div>
 
