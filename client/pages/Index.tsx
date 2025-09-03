@@ -154,7 +154,7 @@ export default function Index() {
         {/* Recent Requests */}
         <Card>
           <CardHeader>
-            <CardTitle>Recent Trip Requests</CardTitle>
+            <CardTitle>Recent Requests</CardTitle>
             <CardDescription>Your latest travel requests and their status</CardDescription>
           </CardHeader>
           <CardContent>
