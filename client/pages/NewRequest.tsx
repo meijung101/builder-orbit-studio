@@ -321,96 +321,141 @@ export default function NewRequest() {
               <CardTitle>Traveler Information</CardTitle>
               <CardDescription>Details for each traveler</CardDescription>
             </div>
-            <Button onClick={addTraveler} variant="outline" size="sm">
-              <Plus className="h-4 w-4 mr-2" />
-              Add Traveler
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button
+                onClick={() => {
+                  // Duplicate the currently active traveler into a new tab
+                  setTravelers((prev) => {
+                    const source = prev.find((t) => t.id === activeTravelerId) || prev[prev.length - 1];
+                    const clone = { ...source, id: Date.now().toString() };
+                    const next = [...prev, clone];
+                    setFormData((fd) => ({ ...fd, numberOfTravelers: next.length }));
+                    setActiveTravelerId(clone.id);
+                    return next;
+                  });
+                }}
+                variant="outline"
+                size="sm"
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                Add Traveler
+              </Button>
+            </div>
           </div>
         </CardHeader>
-        <CardContent className="space-y-6">
-          {travelers.map((traveler, index) => (
-            <div key={traveler.id} className="border rounded-lg p-4 space-y-4">
-              <div className="flex items-center justify-between">
-                <h4 className="font-medium">Traveler {index + 1}</h4>
-                {travelers.length > 1 && (
-                  <Button onClick={() => removeTraveler(traveler.id)} variant="outline" size="sm">
-                    <Minus className="h-4 w-4" />
-                  </Button>
-                )}
-              </div>
+        <CardContent className="space-y-4">
+          <div className="overflow-x-auto">
+            <Tabs value={activeTravelerId} onValueChange={setActiveTravelerId} className="w-full">
+              <TabsList className="min-w-max">
+                {travelers.map((t, idx) => (
+                  <TabsTrigger key={t.id} value={t.id} className="group">
+                    <div className="flex items-center gap-2">
+                      <span>{t.passportName || t.name || `Traveler ${idx + 1}`}</span>
+                      {travelers.length > 1 && (
+                        <button
+                          className="ml-1 rounded p-0.5 text-gray-400 hover:text-red-600"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setTravelers((prev) => {
+                              if (prev.length <= 1) return prev;
+                              const idxToRemove = prev.findIndex((x) => x.id === t.id);
+                              const next = prev.filter((x) => x.id !== t.id);
+                              setFormData((fd) => ({ ...fd, numberOfTravelers: next.length }));
+                              if (t.id === activeTravelerId) {
+                                const nextIdx = Math.max(0, idxToRemove - 1);
+                                setActiveTravelerId(next[nextIdx]?.id ?? next[0]?.id);
+                              }
+                              return next;
+                            });
+                          }}
+                          aria-label={`Remove ${t.passportName || t.name || `Traveler ${idx + 1}`}`}
+                        >
+                          <X className="h-3.5 w-3.5" />
+                        </button>
+                      )}
+                    </div>
+                  </TabsTrigger>
+                ))}
+              </TabsList>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label>Meta Pro ID *</Label>
-                  <Combobox
-                    options={mockEmployees}
-                    value={traveler.metaProId}
-                    onValueChange={(value, option) => handleEmployeeSelect(value, option, traveler.id)}
-                    placeholder="Search employee ID"
-                  />
-                </div>
+              {travelers.map((traveler, index) => (
+                <TabsContent key={traveler.id} value={traveler.id} className="mt-4">
+                  <div className="border rounded-lg p-4 space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label>Meta Pro ID *</Label>
+                        <Combobox
+                          options={mockEmployees}
+                          value={traveler.metaProId}
+                          onValueChange={(value, option) => handleEmployeeSelect(value, option, traveler.id)}
+                          placeholder="Search employee ID"
+                        />
+                      </div>
 
-                <div className="space-y-2">
-                  <Label>Name</Label>
-                  <Input
-                    value={traveler.name}
-                    onChange={(e) => updateTraveler(traveler.id, { name: e.target.value })}
-                    placeholder="Employee name"
-                    disabled
-                  />
-                </div>
+                      <div className="space-y-2">
+                        <Label>Name</Label>
+                        <Input
+                          value={traveler.name}
+                          onChange={(e) => updateTraveler(traveler.id, { name: e.target.value })}
+                          placeholder="Employee name"
+                          disabled
+                        />
+                      </div>
 
-                <div className="space-y-2">
-                  <Label>Department</Label>
-                  <Input
-                    value={traveler.department}
-                    onChange={(e) => updateTraveler(traveler.id, { department: e.target.value })}
-                    placeholder="Department"
-                    disabled
-                  />
-                </div>
+                      <div className="space-y-2">
+                        <Label>Department</Label>
+                        <Input
+                          value={traveler.department}
+                          onChange={(e) => updateTraveler(traveler.id, { department: e.target.value })}
+                          placeholder="Department"
+                          disabled
+                        />
+                      </div>
 
-                <div className="space-y-2">
-                  <Label>Title</Label>
-                  <Input
-                    value={traveler.title}
-                    onChange={(e) => updateTraveler(traveler.id, { title: e.target.value })}
-                    placeholder="Job title"
-                    disabled
-                  />
-                </div>
+                      <div className="space-y-2">
+                        <Label>Title</Label>
+                        <Input
+                          value={traveler.title}
+                          onChange={(e) => updateTraveler(traveler.id, { title: e.target.value })}
+                          placeholder="Job title"
+                          disabled
+                        />
+                      </div>
 
-                <div className="space-y-2">
-                  <Label>Passport Name *</Label>
-                  <Input
-                    value={traveler.passportName}
-                    onChange={(e) => updateTraveler(traveler.id, { passportName: e.target.value })}
-                    placeholder="Name as shown on passport"
-                  />
-                </div>
+                      <div className="space-y-2">
+                        <Label>Passport Name *</Label>
+                        <Input
+                          value={traveler.passportName}
+                          onChange={(e) => updateTraveler(traveler.id, { passportName: e.target.value })}
+                          placeholder="Name as shown on passport"
+                        />
+                      </div>
 
-                <div className="space-y-2">
-                  <Label>Date of Birth *</Label>
-                  <Input
-                    type="date"
-                    value={traveler.dateOfBirth ? traveler.dateOfBirth.toISOString().split('T')[0] : ""}
-                    onChange={(e) => updateTraveler(traveler.id, { 
-                      dateOfBirth: e.target.value ? new Date(e.target.value) : null 
-                    })}
-                  />
-                </div>
-              </div>
+                      <div className="space-y-2">
+                        <Label>Date of Birth *</Label>
+                        <Input
+                          type="date"
+                          value={traveler.dateOfBirth ? traveler.dateOfBirth.toISOString().split('T')[0] : ""}
+                          onChange={(e) => updateTraveler(traveler.id, {
+                            dateOfBirth: e.target.value ? new Date(e.target.value) : null
+                          })}
+                        />
+                      </div>
+                    </div>
 
-              <div className="space-y-2">
-                <Label>Individual Travel Dates</Label>
-                <DateRangePicker
-                  value={traveler.travelDates}
-                  onValueChange={(range) => updateTraveler(traveler.id, { travelDates: range })}
-                  placeholder="Select individual travel dates"
-                />
-              </div>
-            </div>
-          ))}
+                    <div className="space-y-2">
+                      <Label>Individual Travel Dates</Label>
+                      <DateRangePicker
+                        value={traveler.travelDates}
+                        onValueChange={(range) => updateTraveler(traveler.id, { travelDates: range })}
+                        placeholder="Select individual travel dates"
+                      />
+                    </div>
+                  </div>
+                </TabsContent>
+              ))}
+            </Tabs>
+          </div>
         </CardContent>
       </Card>
 
