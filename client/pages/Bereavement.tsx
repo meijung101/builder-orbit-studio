@@ -190,7 +190,7 @@ export default function BereavementRequestForm() {
               </p>
             )}
           </div>
-          <button onClick={handleNewRequest} className="mt-6 bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 transition-colors">
+          <button onClick={handleNewRequest} className="mt-6 bg-primary text-white px-6 py-2 rounded hover:opacity-90 transition-colors">
             Submit Another Request
           </button>
         </div>
@@ -202,7 +202,7 @@ export default function BereavementRequestForm() {
     <div className="min-h-screen bg-gray-50 p-4">
       <div className="max-w-4xl mx-auto">
         <div className="bg-white rounded-lg shadow-lg overflow-hidden">
-          <div className="bg-blue-600 text-white p-6">
+          <div className="bg-primary text-white p-6">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-3">
                 <Heart className="w-8 h-8" />
@@ -211,19 +211,19 @@ export default function BereavementRequestForm() {
               <div className="flex gap-2">
                 <button
                   onClick={() => setUserRole("requestor")}
-                  className={`px-3 py-1 rounded text-sm ${userRole === "requestor" ? "bg-white text-blue-600" : "bg-blue-500 text-white hover:bg-blue-400"} transition-colors`}
+                  className={`px-3 py-1 rounded text-sm ${userRole === "requestor" ? "bg-white text-primary" : "bg-primary/100 text-white hover:opacity-90"} transition-colors`}
                 >
                   Requestor
                 </button>
                 <button
                   onClick={() => setUserRole("ga_staff")}
-                  className={`px-3 py-1 rounded text-sm ${userRole === "ga_staff" ? "bg-white text-blue-600" : "bg-blue-500 text-white hover:bg-blue-400"} transition-colors`}
+                  className={`px-3 py-1 rounded text-sm ${userRole === "ga_staff" ? "bg-white text-primary" : "bg-primary/100 text-white hover:opacity-90"} transition-colors`}
                 >
                   GA Staff
                 </button>
               </div>
             </div>
-            <p className="text-blue-100">Express sympathy and support during difficult times{userRole === "ga_staff" && " - Processing Mode"}</p>
+            <p className="text-primary/20">Express sympathy and support during difficult times{userRole === "ga_staff" && " - Processing Mode"}</p>
           </div>
 
           <div className="bg-gray-100 px-6 py-4">
@@ -232,7 +232,7 @@ export default function BereavementRequestForm() {
               <span className="text-sm text-gray-500">{Math.round((currentSection / maxSections) * 100)}% Complete</span>
             </div>
             <div className="w-full bg-gray-200 rounded-full h-2">
-              <div className="bg-blue-600 h-2 rounded-full transition-all duration-300" style={{ width: `${(currentSection / maxSections) * 100}%` }} />
+              <div className="bg-primary h-2 rounded-full transition-all duration-300" style={{ width: `${(currentSection / maxSections) * 100}%` }} />
             </div>
           </div>
 
@@ -240,7 +240,7 @@ export default function BereavementRequestForm() {
             {currentSection === 1 && (
               <div className="space-y-6">
                 <div className="flex items-center gap-3 mb-6">
-                  <User className="w-6 h-6 text-blue-600" />
+                  <User className="w-6 h-6 text-primary" />
                   <h2 className="text-xl font-semibold text-gray-800">Requestor Information</h2>
                 </div>
 
@@ -272,9 +272,9 @@ export default function BereavementRequestForm() {
                   </div>
                 </div>
 
-                <div className="bg-blue-50 border border-blue-200 rounded-md p-4">
-                  <h3 className="font-medium text-blue-800 mb-2">ℹ️ Prepopulated Information</h3>
-                  <p className="text-sm text-blue-700">Your name, department, and email have been automatically filled from your user profile. Only your contact phone number needs to be entered.</p>
+                <div className="bg-primary/10 border border-primary/20 rounded-md p-4">
+                  <h3 className="font-medium text-primary mb-2">ℹ️ Prepopulated Information</h3>
+                  <p className="text-sm text-primary">Your name, department, and email have been automatically filled from your user profile. Only your contact phone number needs to be entered.</p>
                 </div>
               </div>
             )}
@@ -282,7 +282,7 @@ export default function BereavementRequestForm() {
             {currentSection === 2 && (
               <div className="space-y-6">
                 <div className="flex items-center gap-3 mb-6">
-                  <Search className="w-6 h-6 text-blue-600" />
+                  <Search className="w-6 h-6 text-primary" />
                   <h2 className="text-xl font-semibold text-gray-800">Employee Information</h2>
                 </div>
 
@@ -307,7 +307,7 @@ export default function BereavementRequestForm() {
                               <div className="text-sm text-gray-500">{employee.id} • {employee.title}</div>
                               <div className="text-xs text-gray-400">Manager: {employee.manager} • {employee.department}</div>
                             </div>
-                            <div className="text-xs text-blue-600">Select</div>
+                            <div className="text-xs text-primary">Select</div>
                           </div>
                         </button>
                       ))}
@@ -325,9 +325,9 @@ export default function BereavementRequestForm() {
                   </div>
                 </div>
 
-                <div className="bg-blue-50 border border-blue-200 rounded-md p-4">
-                  <h3 className="font-medium text-blue-800 mb-2">💡 Search Tips:</h3>
-                  <ul className="text-sm text-blue-700 space-y-1">
+                <div className="bg-primary/10 border border-primary/20 rounded-md p-4">
+                  <h3 className="font-medium text-primary mb-2">💡 Search Tips:</h3>
+                  <ul className="text-sm text-primary space-y-1">
                     <li>• Try searching: "Robert", "Emily", "EMP005", "Coordinator"</li>
                     <li>• Only employees in your department ({formData.department}) will appear</li>
                     <li>• Search works with names, employee IDs, or job titles</li>
@@ -339,7 +339,7 @@ export default function BereavementRequestForm() {
             {currentSection === 3 && (
               <div className="space-y-6">
                 <div className="flex items-center gap-3 mb-6">
-                  <FileText className="w-6 h-6 text-blue-600" />
+                  <FileText className="w-6 h-6 text-primary" />
                   <h2 className="text-xl font-semibold text-gray-800">Bereavement Details</h2>
                 </div>
 
@@ -397,23 +397,23 @@ export default function BereavementRequestForm() {
                 {userRole === "ga_staff" ? (
                   <>
                     <div className="flex items-center gap-3 mb-6">
-                      <FileText className="w-6 h-6 text-blue-600" />
+                      <FileText className="w-6 h-6 text-primary" />
                       <h2 className="text-xl font-semibold text-gray-800">Invoice Information</h2>
-                      <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded">GA Staff Only</span>
+                      <span className="bg-primary/15 text-primary text-xs px-2 py-1 rounded">GA Staff Only</span>
                     </div>
 
-                    <div className="bg-blue-50 border border-blue-200 rounded-md p-4 mb-6">
-                      <p className="text-blue-800 text-sm"><strong>New Fields per Business Requirements:</strong> Invoice information to be entered by GA staff for processing and record keeping.</p>
+                    <div className="bg-primary/10 border border-primary/20 rounded-md p-4 mb-6">
+                      <p className="text-primary text-sm"><strong>New Fields per Business Requirements:</strong> Invoice information to be entered by GA staff for processing and record keeping.</p>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Invoice Number * <span className="text-blue-600 text-xs">(New Field)</span></label>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Invoice Number * <span className="text-primary text-xs">(New Field)</span></label>
                         <input type="text" value={formData.invoiceNumber} onChange={(e) => handleInputChange("invoiceNumber", e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter invoice number" />
                       </div>
 
                       <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Invoice Amount * <span className="text-blue-600 text-xs">(New Field)</span></label>
+                        <label className="block text-sm font-medium text-gray-700 mb-2">Invoice Amount * <span className="text-primary text-xs">(New Field)</span></label>
                         <div className="relative">
                           <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">$</span>
                           <input type="number" step="0.01" value={formData.invoiceAmount} onChange={(e) => handleInputChange("invoiceAmount", e.target.value)} className="w-full pl-8 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="0.00" />
@@ -424,7 +424,7 @@ export default function BereavementRequestForm() {
                 ) : (
                   <>
                     <div className="flex items-center gap-3 mb-6">
-                      <CheckCircle className="w-6 h-6 text-blue-600" />
+                      <CheckCircle className="w-6 h-6 text-primary" />
                       <h2 className="text-xl font-semibold text-gray-800">Summary of Details</h2>
                     </div>
 
@@ -447,9 +447,9 @@ export default function BereavementRequestForm() {
                       </div>
                     </div>
 
-                    <div className="bg-blue-50 border border-blue-200 rounded-md p-4">
-                      <h3 className="font-medium text-blue-800 mb-2">📋 Ready for Submission</h3>
-                      <p className="text-sm text-blue-700">Please review all information above carefully before submitting your bereavement gift request.</p>
+                    <div className="bg-primary/10 border border-primary/20 rounded-md p-4">
+                      <h3 className="font-medium text-primary mb-2">📋 Ready for Submission</h3>
+                      <p className="text-sm text-primary">Please review all information above carefully before submitting your bereavement gift request.</p>
                     </div>
 
                     <div className="flex items-start">
@@ -464,7 +464,7 @@ export default function BereavementRequestForm() {
             {currentSection === 5 && userRole === "ga_staff" && (
               <div className="space-y-6">
                 <div className="flex items-center gap-3 mb-6">
-                  <CheckCircle className="w-6 h-6 text-blue-600" />
+                  <CheckCircle className="w-6 h-6 text-primary" />
                   <h2 className="text-xl font-semibold text-gray-800">Final Review & Processing</h2>
                 </div>
 
@@ -503,7 +503,7 @@ export default function BereavementRequestForm() {
               </button>
               <div className="text-sm text-gray-500">Step {currentSection} of {maxSections}</div>
               {currentSection < maxSections ? (
-                <button type="button" onClick={handleNext} disabled={!isCurrentSectionValid()} className={`px-6 py-2 rounded-md ${!isCurrentSectionValid() ? "bg-gray-200 text-gray-400 cursor-not-allowed" : "bg-blue-600 text-white hover:bg-blue-700"} transition-colors`}>
+                <button type="button" onClick={handleNext} disabled={!isCurrentSectionValid()} className={`px-6 py-2 rounded-md ${!isCurrentSectionValid() ? "bg-gray-200 text-gray-400 cursor-not-allowed" : "bg-primary text-white hover:opacity-90"} transition-colors`}>
                   Next
                 </button>
               ) : (
