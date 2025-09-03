@@ -204,10 +204,10 @@ export default function Index() {
           </CardHeader>
           <CardContent>
             <div className="space-y-3">
-              <Link to="/request/new">
+              <Link to="/request/select">
                 <Button className="w-full justify-start" variant="outline">
                   <PlaneTakeoff className="h-4 w-4 mr-2" />
-                  Create New Trip Request
+                  Create New Request
                 </Button>
               </Link>
               
