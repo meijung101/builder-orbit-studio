@@ -11,7 +11,8 @@ import {
   Menu, 
   X,
   User,
-  LogOut
+  LogOut,
+  ClipboardList
 } from "lucide-react";
 
 interface LayoutProps {
