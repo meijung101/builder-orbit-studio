@@ -797,14 +797,6 @@ export default function NewRequest() {
               <Label>WBS (Optional)</Label>
               <Input placeholder="Work breakdown structure" value={""} onChange={() => {}} />
             </div>
-            <div className="space-y-2">
-              <Label>Cash Advance</Label>
-              <div className="relative">
-                <DollarSign className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                <Input placeholder="0.00" value={formData.cashAdvance} onChange={(e) => setFormData({ ...formData, cashAdvance: e.target.value })} className="pl-10 bg-gray-50" disabled />
-              </div>
-              <p className="text-xs text-gray-500">Cash advance will be available after SAP integration</p>
-            </div>
           </div>
         </CardContent>
       </Card>
