@@ -5,25 +5,51 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Separator } from "@/components/ui/separator";
 import { DateRangePicker } from "@/components/ui/date-range-picker";
 import { Combobox, ComboboxOption } from "@/components/ui/combobox";
 import { MultiSelect, MultiSelectOption } from "@/components/ui/multi-select";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { 
-  CalendarDays, 
-  MapPin, 
-  Users, 
-  DollarSign, 
-  Plus, 
-  Minus,
-  Save,
-  Send,
-  X
-} from "lucide-react";
+import { Plus, Minus, DollarSign, Send, X, RefreshCw } from "lucide-react";
 import { DateRange } from "react-day-picker";
+
+interface FlightInfo {
+  id: string;
+  departureDateTime: Date | null;
+  arrivalDateTime: Date | null;
+  from: string;
+  to: string;
+  flightNumber?: string;
+  cost?: string;
+}
+
+interface HotelInfo {
+  id: string;
+  checkIn: Date | null;
+  checkOut: Date | null;
+  location: string;
+  hotelName?: string;
+  cost?: string;
+}
+
+interface RentalCarInfo {
+  id: string;
+  pickupDateTime: Date | null;
+  dropoffDateTime: Date | null;
+  pickupLocation: string;
+  dropoffLocation: string;
+  vendor?: string;
+  carClass?: string;
+  cost?: string;
+}
+
+interface PerDiemItem {
+  id: string;
+  location: string; // value from destinations list
+  dailyRate: number;
+  days: number;
+  total: number;
+}
 
 interface TravelerInfo {
   id: string;
@@ -34,16 +60,10 @@ interface TravelerInfo {
   passportName: string;
   dateOfBirth: Date | null;
   travelDates: DateRange | undefined;
-}
-
-interface FlightHotelInfo {
-  id: string;
-  type: "flight" | "hotel";
-  departureCheckIn: Date | null;
-  arrivalCheckOut: Date | null;
-  departureLocation: string;
-  arrivalLocation: string;
-  flightNumber?: string;
+  flights: FlightInfo[];
+  hotels: HotelInfo[];
+  rentalCars: RentalCarInfo[];
+  perDiem: PerDiemItem[];
 }
 
 const tripTypes: ComboboxOption[] = [
@@ -54,21 +74,9 @@ const tripTypes: ComboboxOption[] = [
 ];
 
 const mockEmployees: ComboboxOption[] = [
-  { 
-    value: "emp001", 
-    label: "John Doe (EMP001)", 
-    metadata: { department: "Engineering", title: "Senior Developer" } 
-  },
-  { 
-    value: "emp002", 
-    label: "Jane Smith (EMP002)", 
-    metadata: { department: "Marketing", title: "Marketing Manager" } 
-  },
-  { 
-    value: "emp003", 
-    label: "Mike Johnson (EMP003)", 
-    metadata: { department: "Sales", title: "Sales Director" } 
-  },
+  { value: "emp001", label: "John Doe (EMP001)", metadata: { department: "Engineering", title: "Senior Developer" } },
+  { value: "emp002", label: "Jane Smith (EMP002)", metadata: { department: "Marketing", title: "Marketing Manager" } },
+  { value: "emp003", label: "Mike Johnson (EMP003)", metadata: { department: "Sales", title: "Sales Director" } },
 ];
 
 const destinations: MultiSelectOption[] = [
@@ -79,6 +87,58 @@ const destinations: MultiSelectOption[] = [
   { value: "shanghai", label: "Shanghai, China" },
   { value: "bangkok", label: "Bangkok, Thailand" },
 ];
+
+const PER_DIEM_MASTER: Record<string, number> = {
+  seoul: 120,
+  tokyo: 135,
+  singapore: 110,
+  "hong-kong": 140,
+  shanghai: 100,
+  bangkok: 90,
+};
+
+function daysFromRange(range: DateRange | undefined): number {
+  if (!range?.from || !range?.to) return 0;
+  const ms = range.to.getTime() - range.from.getTime();
+  const days = Math.floor(ms / (1000 * 60 * 60 * 24)) + 1; // inclusive
+  return Math.max(0, days);
+}
+
+function createEmptyTraveler(): TravelerInfo {
+  return {
+    id: Date.now().toString(),
+    metaProId: "",
+    name: "",
+    department: "",
+    title: "",
+    passportName: "",
+    dateOfBirth: null,
+    travelDates: undefined,
+    flights: [
+      {
+        id: `${Date.now()}-f1`,
+        departureDateTime: null,
+        arrivalDateTime: null,
+        from: "",
+        to: "",
+        flightNumber: "",
+        cost: "",
+      },
+    ],
+    hotels: [
+      {
+        id: `${Date.now()}-h1`,
+        checkIn: null,
+        checkOut: null,
+        location: "",
+        hotelName: "",
+        cost: "",
+      },
+    ],
+    rentalCars: [],
+    perDiem: [],
+  };
+}
 
 export default function NewRequest() {
   const navigate = useNavigate();
@@ -95,89 +155,165 @@ export default function NewRequest() {
     cashAdvance: "",
   });
 
-  const [travelers, setTravelers] = useState<TravelerInfo[]>([
-    {
-      id: "1",
-      metaProId: "",
-      name: "",
-      department: "",
-      title: "",
-      passportName: "",
-      dateOfBirth: null,
-      travelDates: undefined,
-    }
-  ]);
-
+  const [travelers, setTravelers] = useState<TravelerInfo[]>([createEmptyTraveler()]);
   const [activeTravelerId, setActiveTravelerId] = useState(travelers[0].id);
 
-  const [flightHotelInfo, setFlightHotelInfo] = useState<FlightHotelInfo[]>([
-    {
-      id: "1",
-      type: "flight",
-      departureCheckIn: null,
-      arrivalCheckOut: null,
-      departureLocation: "",
-      arrivalLocation: "",
-      flightNumber: "",
-    }
-  ]);
-
-  const [costs, setCosts] = useState({
-    airCost: "",
-    hotelCost: "",
-    carRentalCost: "",
-    perDiemCost: "",
-    costCenter: "",
-    wbs: "",
-  });
+  const updateTraveler = (id: string, updates: Partial<TravelerInfo>) => {
+    setTravelers((prev) => prev.map((t) => (t.id === id ? { ...t, ...updates } : t)));
+  };
 
   const addTraveler = () => {
-    const newTraveler: TravelerInfo = {
-      id: Date.now().toString(),
-      metaProId: "",
-      name: "",
-      department: "",
-      title: "",
-      passportName: "",
-      dateOfBirth: null,
-      travelDates: undefined,
-    };
-    setTravelers([...travelers, newTraveler]);
-    setFormData({ ...formData, numberOfTravelers: travelers.length + 1 });
+    const t = createEmptyTraveler();
+    setTravelers((prev) => {
+      const next = [...prev, t];
+      setFormData((fd) => ({ ...fd, numberOfTravelers: next.length }));
+      return next;
+    });
+    setActiveTravelerId(t.id);
+    recalcPerDiem(t.id);
   };
 
   const removeTraveler = (id: string) => {
-    if (travelers.length > 1) {
-      setTravelers(travelers.filter(t => t.id !== id));
-      setFormData({ ...formData, numberOfTravelers: travelers.length - 1 });
-    }
+    setTravelers((prev) => {
+      if (prev.length <= 1) return prev;
+      const idx = prev.findIndex((x) => x.id === id);
+      const next = prev.filter((x) => x.id !== id);
+      setFormData((fd) => ({ ...fd, numberOfTravelers: next.length }));
+      if (id === activeTravelerId) {
+        const nextIdx = Math.max(0, idx - 1);
+        setActiveTravelerId(next[nextIdx]?.id ?? next[0]?.id);
+      }
+      return next;
+    });
   };
 
-  const updateTraveler = (id: string, updates: Partial<TravelerInfo>) => {
-    setTravelers(travelers.map(t => t.id === id ? { ...t, ...updates } : t));
+  // Flight handlers
+  const addFlight = (travelerId: string) => {
+    updateTraveler(travelerId, {
+      flights: [
+        ...travelers.find((t) => t.id === travelerId)!.flights,
+        {
+          id: `${Date.now()}-f`;
+          departureDateTime: null,
+          arrivalDateTime: null,
+          from: "",
+          to: "",
+          flightNumber: "",
+          cost: "",
+        },
+      ],
+    });
   };
 
-  const addFlightHotel = () => {
-    const newEntry: FlightHotelInfo = {
-      id: Date.now().toString(),
-      type: "flight",
-      departureCheckIn: null,
-      arrivalCheckOut: null,
-      departureLocation: "",
-      arrivalLocation: "",
-      flightNumber: "",
-    };
-    setFlightHotelInfo([...flightHotelInfo, newEntry]);
+  const updateFlight = (travelerId: string, flightId: string, updates: Partial<FlightInfo>) => {
+    const t = travelers.find((x) => x.id === travelerId)!;
+    updateTraveler(travelerId, {
+      flights: t.flights.map((f) => (f.id === flightId ? { ...f, ...updates } : f)),
+    });
   };
 
-  const removeFlightHotel = (id: string) => {
-    if (flightHotelInfo.length > 1) {
-      setFlightHotelInfo(flightHotelInfo.filter(f => f.id !== id));
-    }
+  const removeFlight = (travelerId: string, flightId: string) => {
+    const t = travelers.find((x) => x.id === travelerId)!;
+    if (t.flights.length <= 1) return;
+    updateTraveler(travelerId, {
+      flights: t.flights.filter((f) => f.id !== flightId),
+    });
   };
 
-  const updateFlightHotel = (id: string, updates: Partial<FlightHotelInfo>) => {
-    setFlightHotelInfo(flightHotelInfo.map(f => f.id === id ? { ...f, ...updates } : f));
+  // Hotel handlers
+  const addHotel = (travelerId: string) => {
+    const t = travelers.find((x) => x.id === travelerId)!;
+    updateTraveler(travelerId, {
+      hotels: [
+        ...t.hotels,
+        {
+          id: `${Date.now()}-h`,
+          checkIn: null,
+          checkOut: null,
+          location: "",
+          hotelName: "",
+          cost: "",
+        },
+      ],
+    });
+  };
+
+  const updateHotel = (travelerId: string, hotelId: string, updates: Partial<HotelInfo>) => {
+    const t = travelers.find((x) => x.id === travelerId)!;
+    updateTraveler(travelerId, {
+      hotels: t.hotels.map((h) => (h.id === hotelId ? { ...h, ...updates } : h)),
+    });
+  };
+
+  const removeHotel = (travelerId: string, hotelId: string) => {
+    const t = travelers.find((x) => x.id === travelerId)!;
+    if (t.hotels.length <= 1) return;
+    updateTraveler(travelerId, {
+      hotels: t.hotels.filter((h) => h.id !== hotelId),
+    });
+  };
+
+  // Rental car handlers
+  const addRentalCar = (travelerId: string) => {
+    const t = travelers.find((x) => x.id === travelerId)!;
+    updateTraveler(travelerId, {
+      rentalCars: [
+        ...t.rentalCars,
+        {
+          id: `${Date.now()}-c`,
+          pickupDateTime: null,
+          dropoffDateTime: null,
+          pickupLocation: "",
+          dropoffLocation: "",
+          vendor: "",
+          carClass: "",
+          cost: "",
+        },
+      ],
+    });
+  };
+
+  const updateRentalCar = (travelerId: string, carId: string, updates: Partial<RentalCarInfo>) => {
+    const t = travelers.find((x) => x.id === travelerId)!;
+    updateTraveler(travelerId, {
+      rentalCars: t.rentalCars.map((c) => (c.id === carId ? { ...c, ...updates } : c)),
+    });
+  };
+
+  const removeRentalCar = (travelerId: string, carId: string) => {
+    const t = travelers.find((x) => x.id === travelerId)!;
+    updateTraveler(travelerId, {
+      rentalCars: t.rentalCars.filter((c) => c.id !== carId),
+    });
+  };
+
+  // Per diem
+  const recalcPerDiem = (travelerId: string) => {
+    const t = travelers.find((x) => x.id === travelerId)!;
+    const range = t.travelDates ?? formData.travelDates;
+    const days = Math.max(1, daysFromRange(range));
+    const rows: PerDiemItem[] = formData.destinations.map((loc) => {
+      const rate = PER_DIEM_MASTER[loc] ?? 0;
+      return {
+        id: `${travelerId}-${loc}`,
+        location: loc,
+        dailyRate: rate,
+        days,
+        total: rate * days,
+      };
+    });
+    updateTraveler(travelerId, { perDiem: rows });
+  };
+
+  const updatePerDiemItem = (travelerId: string, perDiemId: string, updates: Partial<PerDiemItem>) => {
+    const t = travelers.find((x) => x.id === travelerId)!;
+    const next = t.perDiem.map((p) => {
+      if (p.id !== perDiemId) return p;
+      const merged = { ...p, ...updates } as PerDiemItem;
+      merged.total = (merged.dailyRate || 0) * (merged.days || 0);
+      return merged;
+    });
+    updateTraveler(travelerId, { perDiem: next });
   };
 
   const handleEmployeeSelect = (value: string, option: ComboboxOption | undefined, travelerId: string) => {
@@ -192,12 +328,10 @@ export default function NewRequest() {
   };
 
   const handleSaveRequest = () => {
-    // Save as draft logic
     alert("Request saved as draft");
   };
 
   const handleSubmitRequest = () => {
-    // Submit for approval logic
     alert("Request submitted for approval");
     navigate("/requests");
   };
@@ -206,6 +340,13 @@ export default function NewRequest() {
     if (window.confirm("Are you sure you want to cancel? All changes will be lost.")) {
       navigate("/");
     }
+  };
+
+  const sendToTravelAgent = (travelerId: string) => {
+    const t = travelers.find((x) => x.id === travelerId)!;
+    // Placeholder. In production, POST to backend/agent system.
+    console.log("Send to agent", { traveler: t });
+    alert(`Itinerary for ${t.passportName || t.name || "Traveler"} sent to travel agent.`);
   };
 
   return (
@@ -237,7 +378,7 @@ export default function NewRequest() {
                 placeholder="Select trip type"
               />
             </div>
-            
+
             <div className="space-y-2">
               <Label htmlFor="estimatedCost">Estimated Total Cost *</Label>
               <div className="relative">
@@ -316,30 +457,16 @@ export default function NewRequest() {
         </CardContent>
       </Card>
 
-      {/* Traveler Information Section */}
+      {/* Traveler Information Section (with itineraries) */}
       <Card>
         <CardHeader>
           <div className="flex items-center justify-between">
             <div>
               <CardTitle>Traveler Information</CardTitle>
-              <CardDescription>Details for each traveler</CardDescription>
+              <CardDescription>Each traveler has their own full itinerary</CardDescription>
             </div>
             <div className="flex items-center gap-2">
-              <Button
-                onClick={() => {
-                  // Duplicate the currently active traveler into a new tab
-                  setTravelers((prev) => {
-                    const source = prev.find((t) => t.id === activeTravelerId) || prev[prev.length - 1];
-                    const clone = { ...source, id: Date.now().toString() };
-                    const next = [...prev, clone];
-                    setFormData((fd) => ({ ...fd, numberOfTravelers: next.length }));
-                    setActiveTravelerId(clone.id);
-                    return next;
-                  });
-                }}
-                variant="outline"
-                size="sm"
-              >
+              <Button onClick={addTraveler} variant="outline" size="sm">
                 <Plus className="h-4 w-4 mr-2" />
                 Add Traveler
               </Button>
@@ -362,17 +489,7 @@ export default function NewRequest() {
                           onClick={(e) => {
                             e.preventDefault();
                             e.stopPropagation();
-                            setTravelers((prev) => {
-                              if (prev.length <= 1) return prev;
-                              const idxToRemove = prev.findIndex((x) => x.id === t.id);
-                              const next = prev.filter((x) => x.id !== t.id);
-                              setFormData((fd) => ({ ...fd, numberOfTravelers: next.length }));
-                              if (t.id === activeTravelerId) {
-                                const nextIdx = Math.max(0, idxToRemove - 1);
-                                setActiveTravelerId(next[nextIdx]?.id ?? next[0]?.id);
-                              }
-                              return next;
-                            });
+                            removeTraveler(t.id);
                           }}
                           aria-label={`Remove ${t.passportName || t.name || `Traveler ${idx + 1}`}`}
                         >
@@ -385,8 +502,16 @@ export default function NewRequest() {
               </TabsList>
 
               {travelers.map((traveler, index) => (
-                <TabsContent key={traveler.id} value={traveler.id} className="mt-4">
+                <TabsContent key={traveler.id} value={traveler.id} className="mt-4 space-y-6">
+                  {/* Personal section */}
                   <div className="border rounded-lg p-4 space-y-4">
+                    <div className="flex items-center justify-between">
+                      <h4 className="font-medium">Traveler {index + 1} • Personal</h4>
+                      <Button variant="outline" size="sm" onClick={() => sendToTravelAgent(traveler.id)}>
+                        <Send className="h-4 w-4 mr-2" />
+                        Send to Travel Agent
+                      </Button>
+                    </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <div className="space-y-2">
                         <Label>Meta Pro ID *</Label>
@@ -397,37 +522,18 @@ export default function NewRequest() {
                           placeholder="Search employee ID"
                         />
                       </div>
-
                       <div className="space-y-2">
                         <Label>Name</Label>
-                        <Input
-                          value={traveler.name}
-                          onChange={(e) => updateTraveler(traveler.id, { name: e.target.value })}
-                          placeholder="Employee name"
-                          disabled
-                        />
+                        <Input value={traveler.name} disabled placeholder="Employee name" />
                       </div>
-
                       <div className="space-y-2">
                         <Label>Department</Label>
-                        <Input
-                          value={traveler.department}
-                          onChange={(e) => updateTraveler(traveler.id, { department: e.target.value })}
-                          placeholder="Department"
-                          disabled
-                        />
+                        <Input value={traveler.department} disabled placeholder="Department" />
                       </div>
-
                       <div className="space-y-2">
                         <Label>Title</Label>
-                        <Input
-                          value={traveler.title}
-                          onChange={(e) => updateTraveler(traveler.id, { title: e.target.value })}
-                          placeholder="Job title"
-                          disabled
-                        />
+                        <Input value={traveler.title} disabled placeholder="Job title" />
                       </div>
-
                       <div className="space-y-2">
                         <Label>Passport Name *</Label>
                         <Input
@@ -436,19 +542,15 @@ export default function NewRequest() {
                           placeholder="Name as shown on passport"
                         />
                       </div>
-
                       <div className="space-y-2">
                         <Label>Date of Birth *</Label>
                         <Input
                           type="date"
-                          value={traveler.dateOfBirth ? traveler.dateOfBirth.toISOString().split('T')[0] : ""}
-                          onChange={(e) => updateTraveler(traveler.id, {
-                            dateOfBirth: e.target.value ? new Date(e.target.value) : null
-                          })}
+                          value={traveler.dateOfBirth ? traveler.dateOfBirth.toISOString().split("T")[0] : ""}
+                          onChange={(e) => updateTraveler(traveler.id, { dateOfBirth: e.target.value ? new Date(e.target.value) : null })}
                         />
                       </div>
                     </div>
-
                     <div className="space-y-2">
                       <Label>Individual Travel Dates</Label>
                       <DateRangePicker
@@ -458,6 +560,216 @@ export default function NewRequest() {
                       />
                     </div>
                   </div>
+
+                  {/* Flights */}
+                  <div className="border rounded-lg p-4 space-y-4">
+                    <div className="flex items-center justify-between">
+                      <h4 className="font-medium">Flights</h4>
+                      <Button onClick={() => addFlight(traveler.id)} variant="outline" size="sm">
+                        <Plus className="h-4 w-4 mr-2" /> Add Flight
+                      </Button>
+                    </div>
+                    {traveler.flights.map((f) => (
+                      <div key={f.id} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <div className="space-y-2">
+                          <Label>Departure</Label>
+                          <Input
+                            type="datetime-local"
+                            value={f.departureDateTime ? f.departureDateTime.toISOString().slice(0, 16) : ""}
+                            onChange={(e) => updateFlight(traveler.id, f.id, { departureDateTime: e.target.value ? new Date(e.target.value) : null })}
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label>Arrival</Label>
+                          <Input
+                            type="datetime-local"
+                            value={f.arrivalDateTime ? f.arrivalDateTime.toISOString().slice(0, 16) : ""}
+                            onChange={(e) => updateFlight(traveler.id, f.id, { arrivalDateTime: e.target.value ? new Date(e.target.value) : null })}
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label>From</Label>
+                          <Input value={f.from} onChange={(e) => updateFlight(traveler.id, f.id, { from: e.target.value })} />
+                        </div>
+                        <div className="space-y-2">
+                          <Label>To</Label>
+                          <Input value={f.to} onChange={(e) => updateFlight(traveler.id, f.id, { to: e.target.value })} />
+                        </div>
+                        <div className="space-y-2">
+                          <Label>Flight Number</Label>
+                          <Input value={f.flightNumber} onChange={(e) => updateFlight(traveler.id, f.id, { flightNumber: e.target.value })} />
+                        </div>
+                        <div className="space-y-2">
+                          <Label>Cost</Label>
+                          <Input value={f.cost || ""} onChange={(e) => updateFlight(traveler.id, f.id, { cost: e.target.value })} />
+                        </div>
+                        {traveler.flights.length > 1 && (
+                          <div className="flex items-end">
+                            <Button variant="outline" size="sm" onClick={() => removeFlight(traveler.id, f.id)}>
+                              <Minus className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Hotels */}
+                  <div className="border rounded-lg p-4 space-y-4">
+                    <div className="flex items-center justify-between">
+                      <h4 className="font-medium">Hotels</h4>
+                      <Button onClick={() => addHotel(traveler.id)} variant="outline" size="sm">
+                        <Plus className="h-4 w-4 mr-2" /> Add Hotel
+                      </Button>
+                    </div>
+                    {traveler.hotels.map((h) => (
+                      <div key={h.id} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <div className="space-y-2">
+                          <Label>Check-in</Label>
+                          <Input
+                            type="datetime-local"
+                            value={h.checkIn ? h.checkIn.toISOString().slice(0, 16) : ""}
+                            onChange={(e) => updateHotel(traveler.id, h.id, { checkIn: e.target.value ? new Date(e.target.value) : null })}
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label>Check-out</Label>
+                          <Input
+                            type="datetime-local"
+                            value={h.checkOut ? h.checkOut.toISOString().slice(0, 16) : ""}
+                            onChange={(e) => updateHotel(traveler.id, h.id, { checkOut: e.target.value ? new Date(e.target.value) : null })}
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label>Location</Label>
+                          <Input value={h.location} onChange={(e) => updateHotel(traveler.id, h.id, { location: e.target.value })} />
+                        </div>
+                        <div className="space-y-2">
+                          <Label>Hotel</Label>
+                          <Input value={h.hotelName || ""} onChange={(e) => updateHotel(traveler.id, h.id, { hotelName: e.target.value })} />
+                        </div>
+                        <div className="space-y-2">
+                          <Label>Cost</Label>
+                          <Input value={h.cost || ""} onChange={(e) => updateHotel(traveler.id, h.id, { cost: e.target.value })} />
+                        </div>
+                        {traveler.hotels.length > 1 && (
+                          <div className="flex items-end">
+                            <Button variant="outline" size="sm" onClick={() => removeHotel(traveler.id, h.id)}>
+                              <Minus className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Rental Cars */}
+                  <div className="border rounded-lg p-4 space-y-4">
+                    <div className="flex items-center justify-between">
+                      <h4 className="font-medium">Rental Cars</h4>
+                      <Button onClick={() => addRentalCar(traveler.id)} variant="outline" size="sm">
+                        <Plus className="h-4 w-4 mr-2" /> Add Rental Car
+                      </Button>
+                    </div>
+                    {traveler.rentalCars.length === 0 && (
+                      <p className="text-sm text-gray-500">No rental cars added.</p>
+                    )}
+                    {traveler.rentalCars.map((c) => (
+                      <div key={c.id} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <div className="space-y-2">
+                          <Label>Pickup</Label>
+                          <Input
+                            type="datetime-local"
+                            value={c.pickupDateTime ? c.pickupDateTime.toISOString().slice(0, 16) : ""}
+                            onChange={(e) => updateRentalCar(traveler.id, c.id, { pickupDateTime: e.target.value ? new Date(e.target.value) : null })}
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label>Dropoff</Label>
+                          <Input
+                            type="datetime-local"
+                            value={c.dropoffDateTime ? c.dropoffDateTime.toISOString().slice(0, 16) : ""}
+                            onChange={(e) => updateRentalCar(traveler.id, c.id, { dropoffDateTime: e.target.value ? new Date(e.target.value) : null })}
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label>Pickup Location</Label>
+                          <Input value={c.pickupLocation} onChange={(e) => updateRentalCar(traveler.id, c.id, { pickupLocation: e.target.value })} />
+                        </div>
+                        <div className="space-y-2">
+                          <Label>Dropoff Location</Label>
+                          <Input value={c.dropoffLocation} onChange={(e) => updateRentalCar(traveler.id, c.id, { dropoffLocation: e.target.value })} />
+                        </div>
+                        <div className="space-y-2">
+                          <Label>Vendor</Label>
+                          <Input value={c.vendor || ""} onChange={(e) => updateRentalCar(traveler.id, c.id, { vendor: e.target.value })} />
+                        </div>
+                        <div className="space-y-2">
+                          <Label>Class</Label>
+                          <Input value={c.carClass || ""} onChange={(e) => updateRentalCar(traveler.id, c.id, { carClass: e.target.value })} />
+                        </div>
+                        <div className="space-y-2">
+                          <Label>Cost</Label>
+                          <Input value={c.cost || ""} onChange={(e) => updateRentalCar(traveler.id, c.id, { cost: e.target.value })} />
+                        </div>
+                        <div className="flex items-end">
+                          <Button variant="outline" size="sm" onClick={() => removeRentalCar(traveler.id, c.id)}>
+                            <Minus className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Per Diem */}
+                  <div className="border rounded-lg p-4 space-y-4">
+                    <div className="flex items-center justify-between">
+                      <h4 className="font-medium">Per Diem</h4>
+                      <Button variant="outline" size="sm" onClick={() => recalcPerDiem(traveler.id)}>
+                        <RefreshCw className="h-4 w-4 mr-2" /> Recalculate from Master
+                      </Button>
+                    </div>
+                    {traveler.perDiem.length === 0 && (
+                      <p className="text-sm text-gray-500">No per diem rows. Click "Recalculate from Master" to generate from selected destinations.</p>
+                    )}
+                    {traveler.perDiem.length > 0 && (
+                      <div className="grid grid-cols-12 gap-2 text-sm">
+                        <div className="col-span-4 font-medium text-gray-600">Location</div>
+                        <div className="col-span-2 font-medium text-gray-600">Daily Rate</div>
+                        <div className="col-span-2 font-medium text-gray-600">Days</div>
+                        <div className="col-span-2 font-medium text-gray-600">Total</div>
+                        <div className="col-span-2" />
+                        {traveler.perDiem.map((p) => (
+                          <>
+                            <div className="col-span-4">
+                              <Input value={destinations.find((d) => d.value === p.location)?.label || p.location} disabled />
+                            </div>
+                            <div className="col-span-2">
+                              <Input
+                                type="number"
+                                value={p.dailyRate}
+                                onChange={(e) => updatePerDiemItem(traveler.id, p.id, { dailyRate: Number(e.target.value || 0) })}
+                              />
+                            </div>
+                            <div className="col-span-2">
+                              <Input
+                                type="number"
+                                value={p.days}
+                                onChange={(e) => updatePerDiemItem(traveler.id, p.id, { days: Number(e.target.value || 0) })}
+                              />
+                            </div>
+                            <div className="col-span-2 flex items-center">${(p.total || 0).toLocaleString()}</div>
+                            <div className="col-span-2" />
+                          </>
+                        ))}
+                        <div className="col-span-8 text-right font-semibold">Grand Total</div>
+                        <div className="col-span-2 font-semibold">
+                          ${traveler.perDiem.reduce((s, r) => s + (r.total || 0), 0).toLocaleString()}
+                        </div>
+                        <div className="col-span-2" />
+                      </div>
+                    )}
+                  </div>
                 </TabsContent>
               ))}
             </Tabs>
@@ -465,104 +777,7 @@ export default function NewRequest() {
         </CardContent>
       </Card>
 
-      {/* Flight & Hotel Information */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle>Flight & Hotel Information</CardTitle>
-              <CardDescription>Itinerary details</CardDescription>
-            </div>
-            <Button onClick={addFlightHotel} variant="outline" size="sm">
-              <Plus className="h-4 w-4 mr-2" />
-              Add Entry
-            </Button>
-          </div>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {flightHotelInfo.map((entry, index) => (
-            <div key={entry.id} className="border rounded-lg p-4 space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                  <h4 className="font-medium">Entry {index + 1}</h4>
-                  <Select
-                    value={entry.type}
-                    onValueChange={(value: "flight" | "hotel") => updateFlightHotel(entry.id, { type: value })}
-                  >
-                    <SelectTrigger className="w-32">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="flight">Flight</SelectItem>
-                      <SelectItem value="hotel">Hotel</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                {flightHotelInfo.length > 1 && (
-                  <Button onClick={() => removeFlightHotel(entry.id)} variant="outline" size="sm">
-                    <Minus className="h-4 w-4" />
-                  </Button>
-                )}
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div className="space-y-2">
-                  <Label>{entry.type === "flight" ? "Departure Date" : "Check-in Date"}</Label>
-                  <Input
-                    type="datetime-local"
-                    value={entry.departureCheckIn ? entry.departureCheckIn.toISOString().slice(0, 16) : ""}
-                    onChange={(e) => updateFlightHotel(entry.id, { 
-                      departureCheckIn: e.target.value ? new Date(e.target.value) : null 
-                    })}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label>{entry.type === "flight" ? "Arrival Date" : "Check-out Date"}</Label>
-                  <Input
-                    type="datetime-local"
-                    value={entry.arrivalCheckOut ? entry.arrivalCheckOut.toISOString().slice(0, 16) : ""}
-                    onChange={(e) => updateFlightHotel(entry.id, { 
-                      arrivalCheckOut: e.target.value ? new Date(e.target.value) : null 
-                    })}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label>{entry.type === "flight" ? "Departure Location" : "Check-in Location"}</Label>
-                  <Input
-                    value={entry.departureLocation}
-                    onChange={(e) => updateFlightHotel(entry.id, { departureLocation: e.target.value })}
-                    placeholder="Location"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label>{entry.type === "flight" ? "Arrival Location" : "Check-out Location"}</Label>
-                  <Input
-                    value={entry.arrivalLocation}
-                    onChange={(e) => updateFlightHotel(entry.id, { arrivalLocation: e.target.value })}
-                    placeholder="Location"
-                  />
-                </div>
-              </div>
-
-              {entry.type === "flight" && (
-                <div className="space-y-2">
-                  <Label>Flight Number</Label>
-                  <Input
-                    value={entry.flightNumber}
-                    onChange={(e) => updateFlightHotel(entry.id, { flightNumber: e.target.value })}
-                    placeholder="Flight number"
-                  />
-                </div>
-              )}
-            </div>
-          ))}
-        </CardContent>
-      </Card>
-
-      {/* Cost Information */}
+      {/* Cost Information (global estimate) */}
       <Card>
         <CardHeader>
           <CardTitle>Cost Information</CardTitle>
@@ -571,89 +786,25 @@ export default function NewRequest() {
         <CardContent className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             <div className="space-y-2">
-              <Label>Air Cost</Label>
-              <div className="relative">
-                <DollarSign className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                <Input
-                  placeholder="0.00"
-                  value={costs.airCost}
-                  onChange={(e) => setCosts({ ...costs, airCost: e.target.value })}
-                  className="pl-10"
-                />
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label>Hotel Cost</Label>
-              <div className="relative">
-                <DollarSign className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                <Input
-                  placeholder="0.00"
-                  value={costs.hotelCost}
-                  onChange={(e) => setCosts({ ...costs, hotelCost: e.target.value })}
-                  className="pl-10"
-                />
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label>Car Rental Cost</Label>
-              <div className="relative">
-                <DollarSign className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                <Input
-                  placeholder="0.00"
-                  value={costs.carRentalCost}
-                  onChange={(e) => setCosts({ ...costs, carRentalCost: e.target.value })}
-                  className="pl-10"
-                />
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label>Per Diem Cost</Label>
-              <div className="relative">
-                <DollarSign className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-                <Input
-                  placeholder="0.00"
-                  value={costs.perDiemCost}
-                  onChange={(e) => setCosts({ ...costs, perDiemCost: e.target.value })}
-                  className="pl-10"
-                />
-              </div>
-            </div>
-
-            <div className="space-y-2">
               <Label>Cost Center *</Label>
               <Input
                 placeholder="Cost center code"
-                value={costs.costCenter}
-                onChange={(e) => setCosts({ ...costs, costCenter: e.target.value })}
+                value={""}
+                onChange={() => {}}
               />
             </div>
-
             <div className="space-y-2">
               <Label>WBS (Optional)</Label>
-              <Input
-                placeholder="Work breakdown structure"
-                value={costs.wbs}
-                onChange={(e) => setCosts({ ...costs, wbs: e.target.value })}
-              />
+              <Input placeholder="Work breakdown structure" value={""} onChange={() => {}} />
             </div>
-          </div>
-
-          <div className="space-y-2">
-            <Label>Cash Advance</Label>
-            <div className="relative">
-              <DollarSign className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
-              <Input
-                placeholder="0.00"
-                value={formData.cashAdvance}
-                onChange={(e) => setFormData({ ...formData, cashAdvance: e.target.value })}
-                className="pl-10 bg-gray-50"
-                disabled
-              />
+            <div className="space-y-2">
+              <Label>Cash Advance</Label>
+              <div className="relative">
+                <DollarSign className="absolute left-3 top-3 h-4 w-4 text-gray-400" />
+                <Input placeholder="0.00" value={formData.cashAdvance} onChange={(e) => setFormData({ ...formData, cashAdvance: e.target.value })} className="pl-10 bg-gray-50" disabled />
+              </div>
+              <p className="text-xs text-gray-500">Cash advance will be available after SAP integration</p>
             </div>
-            <p className="text-xs text-gray-500">Cash advance will be available after SAP integration</p>
           </div>
         </CardContent>
       </Card>
@@ -665,11 +816,9 @@ export default function NewRequest() {
           Cancel
         </Button>
         <Button variant="outline" onClick={handleSaveRequest}>
-          <Save className="h-4 w-4 mr-2" />
           Save Draft
         </Button>
         <Button onClick={handleSubmitRequest}>
-          <Send className="h-4 w-4 mr-2" />
           Submit for Approval
         </Button>
       </div>
