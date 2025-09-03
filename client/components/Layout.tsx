@@ -24,6 +24,7 @@ const navigation = [
   { name: "New Request", href: "/request/new", icon: PlaneTakeoff },
   { name: "My Requests", href: "/requests", icon: FileText },
   { name: "Approvals", href: "/approvals", icon: CheckSquare },
+  { name: "Request Management - GA", href: "/ga/requests", icon: ClipboardList },
   { name: "Master Data", href: "/admin", icon: Settings },
 ];
 
