@@ -12,6 +12,7 @@ import MyRequests from "./pages/MyRequests";
 import Approvals from "./pages/Approvals";
 import Admin from "./pages/Admin";
 import RequestSelect from "./pages/RequestSelect";
+import Bereavement from "./pages/Bereavement";
 import NotFound from "./pages/NotFound";
 
 
