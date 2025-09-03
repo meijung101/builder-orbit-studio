@@ -168,6 +168,7 @@ export default function ShippingRequest() {
         return (
           formData.recipientName &&
           formData.recipientAddress1 &&
+          formData.recipientCountry &&
           formData.recipientCity &&
           formData.recipientState &&
           formData.recipientZipCode
