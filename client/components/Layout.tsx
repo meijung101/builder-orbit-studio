@@ -32,7 +32,13 @@ const navigation: NavItem[] = [
     { name: "Draft", href: "/requests/draft" },
   ] },
   { name: "Approvals", href: "/approvals", icon: CheckSquare },
-  { name: "Inbox - GA", href: "/ga/requests", icon: ClipboardList },
+  { name: "Inbox - GA", href: "/ga/requests", icon: ClipboardList, children: [
+    { name: "Business Card", href: "/ga/requests/business-card" },
+    { name: "Office Supply", href: "/ga/requests/office-supply" },
+    { name: "Trip", href: "/ga/requests/trip" },
+    { name: "Mail", href: "/ga/requests/mail" },
+    { name: "Expense Reimbursement", href: "/ga/requests/expense" },
+  ] },
   { name: "Master Data", href: "/admin", icon: Settings },
 ];
 
@@ -40,6 +46,7 @@ export default function Layout({ children }: LayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [requestDialogOpen, setRequestDialogOpen] = useState(false);
   const [myReqOpen, setMyReqOpen] = useState(false);
+  const [gaOpen, setGaOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -48,6 +55,7 @@ export default function Layout({ children }: LayoutProps) {
       setRequestDialogOpen(true);
     }
     setMyReqOpen(location.pathname.startsWith("/requests"));
+    setGaOpen(location.pathname.startsWith("/ga/requests"));
   }, [location.pathname]);
 
   return (
@@ -74,21 +82,27 @@ export default function Layout({ children }: LayoutProps) {
                 const isInbox = item.name === "Inbox - GA";
                 const hasChildren = !!item.children?.length;
                 if (hasChildren) {
-                  const open = myReqOpen;
+                  const open = item.name === "My Requests" ? myReqOpen : item.name === "Inbox - GA" ? gaOpen : false;
+                  const isSectionActive = item.name === "My Requests" ? location.pathname.startsWith("/requests") : location.pathname.startsWith("/ga/requests");
+                  const toggle = () => {
+                    if (item.name === "My Requests") setMyReqOpen((v) => !v);
+                    else if (item.name === "Inbox - GA") setGaOpen((v) => !v);
+                  };
                   return (
                     <li key={item.name} className="space-y-1">
                       <button
                         className={cn(
                           "w-full flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
-                          location.pathname.startsWith("/requests")
+                          isSectionActive
                             ? "bg-primary text-primary-foreground"
                             : "text-gray-700 hover:bg-gray-100",
                         )}
-                        onClick={() => setMyReqOpen((v) => !v)}
+                        onClick={toggle}
                       >
                         <Icon className="h-5 w-5" />
                         {item.name}
-                        <ChevronDown className={cn("h-4 w-4 ml-auto transition-transform", open ? "rotate-180" : "rotate-0")} />
+                        {isInbox && <Bell className="h-4 w-4 ml-auto" />}
+                        <ChevronDown className={cn("h-4 w-4 ml-2 transition-transform", open ? "rotate-180" : "rotate-0")} />
                       </button>
                       {open && (
                         <ul className="ml-8 space-y-1">
@@ -169,21 +183,27 @@ export default function Layout({ children }: LayoutProps) {
                 const isInbox = item.name === "Inbox - GA";
                 const hasChildren = !!item.children?.length;
                 if (hasChildren) {
-                  const open = myReqOpen;
+                  const open = item.name === "My Requests" ? myReqOpen : item.name === "Inbox - GA" ? gaOpen : false;
+                  const isSectionActive = item.name === "My Requests" ? location.pathname.startsWith("/requests") : location.pathname.startsWith("/ga/requests");
+                  const toggle = () => {
+                    if (item.name === "My Requests") setMyReqOpen((v) => !v);
+                    else if (item.name === "Inbox - GA") setGaOpen((v) => !v);
+                  };
                   return (
                     <li key={item.name} className="space-y-1">
                       <button
                         className={cn(
                           "w-full flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
-                          location.pathname.startsWith("/requests")
+                          isSectionActive
                             ? "bg-primary text-primary-foreground"
                             : "text-gray-700 hover:bg-gray-100",
                         )}
-                        onClick={() => setMyReqOpen((v) => !v)}
+                        onClick={toggle}
                       >
                         <Icon className="h-5 w-5" />
                         {item.name}
-                        <ChevronDown className={cn("h-4 w-4 ml-auto transition-transform", open ? "rotate-180" : "rotate-0")} />
+                        {isInbox && <Bell className="h-4 w-4 ml-auto" />}
+                        <ChevronDown className={cn("h-4 w-4 ml-2 transition-transform", open ? "rotate-180" : "rotate-0")} />
                       </button>
                       {open && (
                         <ul className="ml-8 space-y-1">
