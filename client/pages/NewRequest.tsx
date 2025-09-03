@@ -10,7 +10,7 @@ import { DateRangePicker } from "@/components/ui/date-range-picker";
 import { Combobox, ComboboxOption } from "@/components/ui/combobox";
 import { MultiSelect, MultiSelectOption } from "@/components/ui/multi-select";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Plus, Minus, DollarSign, Send, X, RefreshCw } from "lucide-react";
+import { Plus, Minus, DollarSign, Send, X, RefreshCw, PlaneTakeoff } from "lucide-react";
 import { DateRange } from "react-day-picker";
 
 interface FlightInfo {
