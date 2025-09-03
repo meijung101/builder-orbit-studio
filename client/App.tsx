@@ -38,6 +38,7 @@ const App = () => (
             <Route path="/requests" element={<MyRequests />} />
             <Route path="/approvals" element={<Approvals />} />
             <Route path="/admin" element={<Admin />} />
+            <Route path="/ga/requests" element={<GARequestManagement />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
