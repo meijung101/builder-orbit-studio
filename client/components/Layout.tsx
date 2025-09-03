@@ -1,7 +1,8 @@
-import { ReactNode, useState } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { ReactNode, useEffect, useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
+import RequestTypeDialog from "@/components/RequestTypeDialog";
 import { 
   PlaneTakeoff, 
   FileText, 
@@ -27,7 +28,15 @@ const navigation = [
 
 export default function Layout({ children }: LayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [requestDialogOpen, setRequestDialogOpen] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (location.pathname === "/request/select") {
+      setRequestDialogOpen(true);
+    }
+  }, [location.pathname]);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -49,21 +58,38 @@ export default function Layout({ children }: LayoutProps) {
               {navigation.map((item) => {
                 const Icon = item.icon;
                 const isActive = location.pathname === item.href;
+                const isNewRequest = item.name === "New Request";
                 return (
                   <li key={item.name}>
-                    <Link
-                      to={item.href}
-                      className={cn(
-                        "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
-                        isActive
-                          ? "bg-primary text-primary-foreground"
-                          : "text-gray-700 hover:bg-gray-100"
-                      )}
-                      onClick={() => setSidebarOpen(false)}
-                    >
-                      <Icon className="h-5 w-5" />
-                      {item.name}
-                    </Link>
+                    {isNewRequest ? (
+                      <button
+                        className={cn(
+                          "w-full flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+                          "text-gray-700 hover:bg-gray-100"
+                        )}
+                        onClick={() => {
+                          setRequestDialogOpen(true);
+                          setSidebarOpen(false);
+                        }}
+                      >
+                        <Icon className="h-5 w-5" />
+                        {item.name}
+                      </button>
+                    ) : (
+                      <Link
+                        to={item.href}
+                        className={cn(
+                          "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+                          isActive
+                            ? "bg-primary text-primary-foreground"
+                            : "text-gray-700 hover:bg-gray-100"
+                        )}
+                        onClick={() => setSidebarOpen(false)}
+                      >
+                        <Icon className="h-5 w-5" />
+                        {item.name}
+                      </Link>
+                    )}
                   </li>
                 );
               })}
@@ -83,20 +109,34 @@ export default function Layout({ children }: LayoutProps) {
               {navigation.map((item) => {
                 const Icon = item.icon;
                 const isActive = location.pathname === item.href;
+                const isNewRequest = item.name === "New Request";
                 return (
                   <li key={item.name}>
-                    <Link
-                      to={item.href}
-                      className={cn(
-                        "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
-                        isActive
-                          ? "bg-primary text-primary-foreground"
-                          : "text-gray-700 hover:bg-gray-100"
-                      )}
-                    >
-                      <Icon className="h-5 w-5" />
-                      {item.name}
-                    </Link>
+                    {isNewRequest ? (
+                      <button
+                        className={cn(
+                          "w-full flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+                          "text-gray-700 hover:bg-gray-100"
+                        )}
+                        onClick={() => setRequestDialogOpen(true)}
+                      >
+                        <Icon className="h-5 w-5" />
+                        {item.name}
+                      </button>
+                    ) : (
+                      <Link
+                        to={item.href}
+                        className={cn(
+                          "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+                          isActive
+                            ? "bg-primary text-primary-foreground"
+                            : "text-gray-700 hover:bg-gray-100"
+                        )}
+                      >
+                        <Icon className="h-5 w-5" />
+                        {item.name}
+                      </Link>
+                    )}
                   </li>
                 );
               })}
@@ -137,6 +177,16 @@ export default function Layout({ children }: LayoutProps) {
             {children}
           </div>
         </main>
+
+        <RequestTypeDialog
+          open={requestDialogOpen}
+          onOpenChange={(open) => {
+            setRequestDialogOpen(open);
+            if (!open && location.pathname === "/request/select") {
+              navigate("/");
+            }
+          }}
+        />
       </div>
     </div>
   );
