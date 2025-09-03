@@ -13,6 +13,9 @@ import Approvals from "./pages/Approvals";
 import Admin from "./pages/Admin";
 import RequestSelect from "./pages/RequestSelect";
 import Bereavement from "./pages/Bereavement";
+import OfficeSupplyIndex from "./pages/OfficeSupplyIndex";
+import OfficeSupplyStandard from "./pages/OfficeSupplyStandard";
+import OfficeSupplyNonStandard from "./pages/OfficeSupplyNonStandard";
 import NotFound from "./pages/NotFound";
 import GARequestManagement from "./pages/GARequestManagement";
 
@@ -33,6 +36,9 @@ const App = () => (
             <Route path="/request/expense" element={<RequestSelect />} />
             <Route path="/request/bereavement" element={<Bereavement />} />
             <Route path="/request/mail" element={<RequestSelect />} />
+            <Route path="/request/office-supply" element={<OfficeSupplyIndex />} />
+            <Route path="/request/office-supply/standard" element={<OfficeSupplyStandard />} />
+            <Route path="/request/office-supply/non-standard" element={<OfficeSupplyNonStandard />} />
             <Route path="/request/cellphone" element={<RequestSelect />} />
             <Route path="/request/office-supply" element={<RequestSelect />} />
             <Route path="/requests" element={<MyRequests />} />
