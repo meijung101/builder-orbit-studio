@@ -100,7 +100,7 @@ export default function GARequestManagement() {
         <div className="flex items-center gap-3">
           <ClipboardList className="w-8 h-8" />
           <div>
-            <h1 className="text-2xl font-bold">Inbox - GA</h1>
+            <h1 className="text-2xl font-bold">Inbox - GA{/* category suffix added below via script */}</h1>
             <p className="text-primary/20">Search, update statuses, and edit requests</p>
           </div>
         </div>
