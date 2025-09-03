@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Search, ClipboardList, Edit3, Bell } from "lucide-react";
+import { Search, ClipboardList, Edit3 } from "lucide-react";
 
 interface GARequest {
   id: string;
@@ -88,17 +88,12 @@ export default function GARequestManagement() {
   return (
     <div className="space-y-6">
       <div className="bg-primary text-white p-6 rounded-lg shadow">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <ClipboardList className="w-8 h-8" />
-            <div>
-              <h1 className="text-2xl font-bold">Inbox</h1>
-              <p className="text-primary/20">Search, update statuses, and edit requests</p>
-            </div>
+        <div className="flex items-center gap-3">
+          <ClipboardList className="w-8 h-8" />
+          <div>
+            <h1 className="text-2xl font-bold">Inbox - GA</h1>
+            <p className="text-primary/20">Search, update statuses, and edit requests</p>
           </div>
-          <Button variant="outline" size="icon" className="bg-white/10 text-white border-white/20 hover:bg-white/20">
-            <Bell className="h-5 w-5" />
-          </Button>
         </div>
       </div>
 
