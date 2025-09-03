@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Search, ClipboardList, Edit3 } from "lucide-react";
+import { Search, ClipboardList, Edit3, Bell } from "lucide-react";
 
 interface GARequest {
   id: string;
