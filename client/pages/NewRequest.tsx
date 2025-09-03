@@ -11,6 +11,7 @@ import { Separator } from "@/components/ui/separator";
 import { DateRangePicker } from "@/components/ui/date-range-picker";
 import { Combobox, ComboboxOption } from "@/components/ui/combobox";
 import { MultiSelect, MultiSelectOption } from "@/components/ui/multi-select";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { 
   CalendarDays, 
   MapPin, 
@@ -106,6 +107,8 @@ export default function NewRequest() {
       travelDates: undefined,
     }
   ]);
+
+  const [activeTravelerId, setActiveTravelerId] = useState(travelers[0].id);
 
   const [flightHotelInfo, setFlightHotelInfo] = useState<FlightHotelInfo[]>([
     {
