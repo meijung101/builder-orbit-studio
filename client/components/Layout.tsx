@@ -12,7 +12,8 @@ import {
   X,
   User,
   LogOut,
-  ClipboardList
+  ClipboardList,
+  Bell
 } from "lucide-react";
 
 interface LayoutProps {
@@ -24,7 +25,7 @@ const navigation = [
   { name: "New Request", href: "/request/new", icon: PlaneTakeoff },
   { name: "My Requests", href: "/requests", icon: FileText },
   { name: "Approvals", href: "/approvals", icon: CheckSquare },
-  { name: "Inbox", href: "/ga/requests", icon: ClipboardList },
+  { name: "Inbox - GA", href: "/ga/requests", icon: ClipboardList },
   { name: "Master Data", href: "/admin", icon: Settings },
 ];
 
@@ -61,6 +62,7 @@ export default function Layout({ children }: LayoutProps) {
                 const Icon = item.icon;
                 const isActive = location.pathname === item.href;
                 const isNewRequest = item.name === "New Request";
+                const isInbox = item.name === "Inbox - GA";
                 return (
                   <li key={item.name}>
                     {isNewRequest ? (
@@ -90,6 +92,7 @@ export default function Layout({ children }: LayoutProps) {
                       >
                         <Icon className="h-5 w-5" />
                         {item.name}
+                        {isInbox && <Bell className="h-4 w-4 ml-auto" />}
                       </Link>
                     )}
                   </li>
@@ -112,6 +115,7 @@ export default function Layout({ children }: LayoutProps) {
                 const Icon = item.icon;
                 const isActive = location.pathname === item.href;
                 const isNewRequest = item.name === "New Request";
+                const isInbox = item.name === "Inbox - GA";
                 return (
                   <li key={item.name}>
                     {isNewRequest ? (
@@ -137,6 +141,7 @@ export default function Layout({ children }: LayoutProps) {
                       >
                         <Icon className="h-5 w-5" />
                         {item.name}
+                        {isInbox && <Bell className="h-4 w-4 ml-auto" />}
                       </Link>
                     )}
                   </li>
