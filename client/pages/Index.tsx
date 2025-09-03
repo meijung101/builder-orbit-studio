@@ -86,10 +86,10 @@ export default function Index() {
           <p className="text-gray-600">Welcome back! Here's what's happening with your travel requests.</p>
         </div>
         <div className="mt-4 sm:mt-0">
-          <Link to="/request/new">
+          <Link to="/request/select">
             <Button className="w-full sm:w-auto">
               <Plus className="h-4 w-4 mr-2" />
-              New Trip Request
+              New Request
             </Button>
           </Link>
         </div>
