@@ -3,27 +3,34 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import RequestTypeDialog from "@/components/RequestTypeDialog";
-import { 
-  PlaneTakeoff, 
-  FileText, 
-  CheckSquare, 
-  Settings, 
-  Menu, 
+import {
+  PlaneTakeoff,
+  FileText,
+  CheckSquare,
+  Settings,
+  Menu,
   X,
   User,
   LogOut,
   ClipboardList,
-  Bell
+  Bell,
+  ChevronDown
 } from "lucide-react";
 
 interface LayoutProps {
   children: ReactNode;
 }
 
-const navigation = [
+type NavItem = { name: string; href?: string; icon: any; children?: { name: string; href: string }[] };
+const navigation: NavItem[] = [
   { name: "Dashboard", href: "/", icon: FileText },
   { name: "New Request", href: "/request/new", icon: PlaneTakeoff },
-  { name: "My Requests", href: "/requests", icon: FileText },
+  { name: "My Requests", href: "/requests", icon: FileText, children: [
+    { name: "Pending Approval", href: "/requests/pending" },
+    { name: "Approved/Confirmed", href: "/requests/approved" },
+    { name: "Returned", href: "/requests/returned" },
+    { name: "Draft", href: "/requests/draft" },
+  ] },
   { name: "Approvals", href: "/approvals", icon: CheckSquare },
   { name: "Inbox - GA", href: "/ga/requests", icon: ClipboardList },
   { name: "Master Data", href: "/admin", icon: Settings },
@@ -32,6 +39,7 @@ const navigation = [
 export default function Layout({ children }: LayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [requestDialogOpen, setRequestDialogOpen] = useState(false);
+  const [myReqOpen, setMyReqOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -39,6 +47,7 @@ export default function Layout({ children }: LayoutProps) {
     if (location.pathname === "/request/select") {
       setRequestDialogOpen(true);
     }
+    setMyReqOpen(location.pathname.startsWith("/requests"));
   }, [location.pathname]);
 
   return (
@@ -60,9 +69,51 @@ export default function Layout({ children }: LayoutProps) {
             <ul className="space-y-2">
               {navigation.map((item) => {
                 const Icon = item.icon;
-                const isActive = location.pathname === item.href;
+                const isActive = item.href ? location.pathname === item.href : false;
                 const isNewRequest = item.name === "New Request";
                 const isInbox = item.name === "Inbox - GA";
+                const hasChildren = !!item.children?.length;
+                if (hasChildren) {
+                  const open = myReqOpen;
+                  return (
+                    <li key={item.name} className="space-y-1">
+                      <button
+                        className={cn(
+                          "w-full flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+                          location.pathname.startsWith("/requests")
+                            ? "bg-primary text-primary-foreground"
+                            : "text-gray-700 hover:bg-gray-100",
+                        )}
+                        onClick={() => setMyReqOpen((v) => !v)}
+                      >
+                        <Icon className="h-5 w-5" />
+                        {item.name}
+                        <ChevronDown className={cn("h-4 w-4 ml-auto transition-transform", open ? "rotate-180" : "rotate-0")} />
+                      </button>
+                      {open && (
+                        <ul className="ml-8 space-y-1">
+                          {item.children!.map((child) => (
+                            <li key={child.name}>
+                              <Link
+                                to={child.href}
+                                className={cn(
+                                  "flex items-center gap-2 rounded-md px-3 py-1.5 text-sm transition-colors",
+                                  location.pathname === child.href
+                                    ? "bg-primary/10 text-primary"
+                                    : "text-gray-700 hover:bg-gray-100",
+                                )}
+                                onClick={() => setSidebarOpen(false)}
+                              >
+                                <span className="h-1.5 w-1.5 rounded-full bg-current" />
+                                {child.name}
+                              </Link>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </li>
+                  );
+                }
                 return (
                   <li key={item.name}>
                     {isNewRequest ? (
@@ -81,7 +132,7 @@ export default function Layout({ children }: LayoutProps) {
                       </button>
                     ) : (
                       <Link
-                        to={item.href}
+                        to={item.href!}
                         className={cn(
                           "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
                           isActive
@@ -113,9 +164,50 @@ export default function Layout({ children }: LayoutProps) {
             <ul className="flex flex-1 flex-col gap-y-2">
               {navigation.map((item) => {
                 const Icon = item.icon;
-                const isActive = location.pathname === item.href;
+                const isActive = item.href ? location.pathname === item.href : false;
                 const isNewRequest = item.name === "New Request";
                 const isInbox = item.name === "Inbox - GA";
+                const hasChildren = !!item.children?.length;
+                if (hasChildren) {
+                  const open = myReqOpen;
+                  return (
+                    <li key={item.name} className="space-y-1">
+                      <button
+                        className={cn(
+                          "w-full flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
+                          location.pathname.startsWith("/requests")
+                            ? "bg-primary text-primary-foreground"
+                            : "text-gray-700 hover:bg-gray-100",
+                        )}
+                        onClick={() => setMyReqOpen((v) => !v)}
+                      >
+                        <Icon className="h-5 w-5" />
+                        {item.name}
+                        <ChevronDown className={cn("h-4 w-4 ml-auto transition-transform", open ? "rotate-180" : "rotate-0")} />
+                      </button>
+                      {open && (
+                        <ul className="ml-8 space-y-1">
+                          {item.children!.map((child) => (
+                            <li key={child.name}>
+                              <Link
+                                to={child.href}
+                                className={cn(
+                                  "flex items-center gap-2 rounded-md px-3 py-1.5 text-sm transition-colors",
+                                  location.pathname === child.href
+                                    ? "bg-primary/10 text-primary"
+                                    : "text-gray-700 hover:bg-gray-100",
+                                )}
+                              >
+                                <span className="h-1.5 w-1.5 rounded-full bg-current" />
+                                {child.name}
+                              </Link>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+                    </li>
+                  );
+                }
                 return (
                   <li key={item.name}>
                     {isNewRequest ? (
@@ -131,7 +223,7 @@ export default function Layout({ children }: LayoutProps) {
                       </button>
                     ) : (
                       <Link
-                        to={item.href}
+                        to={item.href!}
                         className={cn(
                           "flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
                           isActive
