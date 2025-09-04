@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ChevronRight, ChevronLeft, Package, User, Truck, Box } from "lucide-react";
+import { ChevronRight, ChevronLeft, Package, User, Truck, Box, FileText } from "lucide-react";
 
 const COUNTRIES: string[] = [
   "United States",
@@ -140,7 +140,7 @@ export default function ShippingRequest() {
     contentsValue: "",
   });
 
-  const totalSteps = 4;
+  const totalSteps = 5;
 
   const handleInputChange = (field: string, value: any) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -183,6 +183,8 @@ export default function ShippingRequest() {
           (formData.packageType === "envelope" || (formData.length && formData.width && formData.height))
         );
       }
+      case 5:
+        return true;
       default:
         return false;
     }
@@ -193,6 +195,7 @@ export default function ShippingRequest() {
     { icon: User, label: "Recipient" },
     { icon: Truck, label: "Shipping" },
     { icon: Package, label: "Package" },
+    { icon: FileText, label: "Review" },
   ];
 
   const StepIndicator = () => (
@@ -691,6 +694,73 @@ export default function ShippingRequest() {
     );
   };
 
+  const Step5 = () => (
+    <div className="space-y-6">
+      <h2 className="text-2xl font-bold text-gray-800 mb-6">Review & Submit</h2>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="bg-gray-50 border rounded-lg p-4">
+          <h3 className="font-medium text-gray-800 mb-2">Sender</h3>
+          <div className="text-sm text-gray-700 space-y-1">
+            <p><strong>Name:</strong> {formData.senderName || "-"}</p>
+            <p><strong>Company:</strong> {formData.senderCompany || "-"}</p>
+            <p><strong>Address:</strong> {formData.senderAddress1}{formData.senderAddress2 ? ", " + formData.senderAddress2 : ""}</p>
+            <p><strong>City/State/ZIP:</strong> {formData.senderCity}, {formData.senderState} {formData.senderZipCode}</p>
+            <p><strong>Phone:</strong> {formData.senderPhone || "-"}</p>
+            <p><strong>Email:</strong> {formData.senderEmail || "-"}</p>
+          </div>
+        </div>
+        <div className="bg-gray-50 border rounded-lg p-4">
+          <h3 className="font-medium text-gray-800 mb-2">Recipient</h3>
+          <div className="text-sm text-gray-700 space-y-1">
+            <p><strong>Name:</strong> {formData.recipientName || "-"}</p>
+            <p><strong>Company:</strong> {formData.recipientCompany || "-"}</p>
+            <p><strong>Address:</strong> {formData.recipientAddress1}{formData.recipientAddress2 ? ", " + formData.recipientAddress2 : ""}</p>
+            <p><strong>Country/Region:</strong> {formData.recipientCountry || "United States"} / {formData.recipientCity}</p>
+            <p><strong>State/ZIP:</strong> {formData.recipientState} {formData.recipientZipCode}</p>
+            <p><strong>Phone:</strong> {formData.recipientPhone || "-"}</p>
+            <p><strong>Email:</strong> {formData.recipientEmail || "-"}</p>
+            <p><strong>Residential:</strong> {formData.isResidential ? "Yes" : "No"}</p>
+          </div>
+        </div>
+      </div>
+      <div className="bg-white border rounded-lg p-4">
+        <h3 className="font-medium text-gray-800 mb-2">Shipping & Package</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-gray-700">
+          <p><strong>Service:</strong> {formData.shippingMethod || "-"}</p>
+          <p><strong>Ship Date:</strong> {formData.requestedShipDate || "-"}</p>
+          <p><strong>Delivery Date:</strong> {formData.requestedDeliveryDate || "-"}</p>
+          <p><strong>Type:</strong> {formData.packageType}</p>
+          {formData.packageType === 'package' && (
+            <p className="md:col-span-2"><strong>Dimensions:</strong> {formData.length} x {formData.width} x {formData.height} inches</p>
+          )}
+        </div>
+        {formData.shippingMethod.includes('DHL International') && (
+          <div className="mt-3 text-sm text-gray-700">
+            <p><strong>Contents:</strong> {formData.contents || "-"}</p>
+            <p><strong>Declared Value (USD):</strong> {formData.contentsValue || "-"}</p>
+          </div>
+        )}
+      </div>
+      <div className="bg-primary/10 border border-primary/20 rounded-lg p-4">
+        <h3 className="font-medium text-primary mb-2">Requestor Information</h3>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
+          <div>
+            <span className="text-gray-600">Meta Pro ID:</span>
+            <p className="font-medium">{formData.requestorMetaProId}</p>
+          </div>
+          <div>
+            <span className="text-gray-600">Name:</span>
+            <p className="font-medium">{formData.requestorName}</p>
+          </div>
+          <div>
+            <span className="text-gray-600">Department:</span>
+            <p className="font-medium">{formData.requestorDepartment}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
   const renderCurrentStep = () => {
     switch (currentStep) {
       case 1:
@@ -701,6 +771,8 @@ export default function ShippingRequest() {
         return <Step3 />;
       case 4:
         return <Step4 />;
+      case 5:
+        return <Step5 />;
       default:
         return null;
     }
