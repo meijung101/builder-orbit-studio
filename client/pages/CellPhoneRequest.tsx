@@ -83,6 +83,11 @@ const CellPhoneRequest = () => {
   };
 
   const updateFormData = (field: keyof FormData, value: any) => setFormData((prev) => ({ ...prev, [field]: value }));
+  const [idQuery, setIdQuery] = useState("");
+  const [showIdDropdown, setShowIdDropdown] = useState(false);
+  const filteredEmployees = sampleEmployees.filter(
+    (e) => e.metaProId.toLowerCase().includes(idQuery.toLowerCase()) || e.name.toLowerCase().includes(idQuery.toLowerCase())
+  );
 
   const handleEmployeeSelect = (metaProId: string) => {
     const emp = sampleEmployees.find((e) => e.metaProId === metaProId);
@@ -148,14 +153,43 @@ const CellPhoneRequest = () => {
     <div className="space-y-6">
       <h2 className="text-2xl font-bold text-gray-800 mb-6">Requestor Information</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">Meta Pro ID *<span className="text-xs text-gray-500 ml-2">(Select to auto-fill information)</span></label>
-          <select value={formData.metaProId} onChange={(e) => handleEmployeeSelect(e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary">
-            <option value="">Select Meta Pro ID</option>
-            {sampleEmployees.map((employee) => (
-              <option key={employee.metaProId} value={employee.metaProId}>{employee.metaProId} - {employee.name}</option>
-            ))}
-          </select>
+        <div className="relative">
+          <label className="block text-sm font-medium text-gray-700 mb-2">Meta Pro ID *<span className="text-xs text-gray-500 ml-2">(Type to search or enter new)</span></label>
+          <input
+            type="text"
+            value={idQuery}
+            onChange={(e) => {
+              const v = e.currentTarget.value;
+              setIdQuery(v);
+              updateFormData('metaProId', v);
+              setShowIdDropdown(true);
+            }}
+            onFocus={() => setShowIdDropdown(true)}
+            onBlur={() => setTimeout(() => setShowIdDropdown(false), 150)}
+            className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
+            placeholder="Search Meta Pro ID or type a new one"
+          />
+          {showIdDropdown && (
+            <ul className="absolute z-10 mt-1 w-full bg-white border rounded shadow max-h-48 overflow-auto">
+              {filteredEmployees.length === 0 && (
+                <li className="p-2 text-sm text-gray-500">No matches. Press Enter to keep "{idQuery}"</li>
+              )}
+              {filteredEmployees.map((emp) => (
+                <li
+                  key={emp.metaProId}
+                  className="p-2 hover:bg-primary/10 cursor-pointer text-sm"
+                  onMouseDown={(e) => e.preventDefault()}
+                  onClick={() => {
+                    setIdQuery(emp.metaProId);
+                    handleEmployeeSelect(emp.metaProId);
+                    setShowIdDropdown(false);
+                  }}
+                >
+                  {emp.metaProId} — {emp.name}
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">Full Name *</label>
@@ -172,10 +206,6 @@ const CellPhoneRequest = () => {
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">Email Address *</label>
           <input type="email" value={formData.email} readOnly className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-600" placeholder="Auto-filled from Meta Pro ID" />
-        </div>
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">Phone Number *</label>
-          <input type="tel" value={formData.phoneNumber} readOnly className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-600" placeholder="Auto-filled from Meta Pro ID" />
         </div>
       </div>
       {formData.metaProId && (
@@ -212,7 +242,7 @@ const CellPhoneRequest = () => {
         </div>
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">Detailed Explanation <span className="text-sm text-gray-500">(who, how often, why needed)</span></label>
-          <textarea value={formData.reasonDetails} onChange={(e) => updateFormData('reasonDetails', e.target.value)} rows={4} className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Please provide detailed explanation of why you need a company cell phone, including who you need to contact, how often, and business justification..." />
+          <textarea value={formData.reasonDetails} onChange={(e) => updateFormData('reasonDetails', e.currentTarget.value)} rows={4} className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Please provide detailed explanation of why you need a company cell phone, including who you need to contact, how often, and business justification..." />
         </div>
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-3">Preferred Phone Type *</label>
@@ -312,7 +342,7 @@ const CellPhoneRequest = () => {
         </label>
         <div className="mt-6">
           <label className="block text-sm font-medium text-gray-700 mb-2">Electronic Signature *</label>
-          <input type="text" value={formData.signature} onChange={(e) => updateFormData('signature', e.target.value)} className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Type your full name to sign electronically" />
+          <input type="text" value={formData.signature} onChange={(e) => updateFormData('signature', e.currentTarget.value)} className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Type your full name to sign electronically" />
           <p className="text-xs text-gray-500 mt-1">By typing your name above, you agree that this constitutes your electronic signature.</p>
         </div>
       </div>
@@ -343,10 +373,11 @@ const CellPhoneRequest = () => {
       <div className="bg-primary/10 border border-primary/20 rounded-lg p-6">
         <h3 className="font-semibold text-primary mb-4">Next Steps - Approval Process</h3>
         <div className="space-y-3 text-sm">
-          <div className="flex items-center"><div className="w-6 h-6 bg-primary text-white rounded-full flex items-center justify-center text-xs font-bold mr-3">1</div><span>Your immediate supervisor review</span></div>
-          <div className="flex items-center"><div className="w-6 h-6 bg-gray-300 text-white rounded-full flex items-center justify-center text-xs font-bold mr-3">2</div><span>Chief Division Officer approval</span></div>
-          <div className="flex items-center"><div className="w-6 h-6 bg-gray-300 text-white rounded-full flex items-center justify-center text-xs font-bold mr-3">3</div><span>General Affairs final approval</span></div>
+          <div className="flex items-center"><div className="w-6 h-6 bg-primary text-white rounded-full flex items-center justify-center text-xs font-bold mr-3">1</div><span>Your department HOD review</span></div>
+          <div className="flex items-center"><div className="w-6 h-6 bg-gray-300 text-white rounded-full flex items-center justify-center text-xs font-bold mr-3">2</div><span>General Affair HOD approval</span></div>
+          <div className="flex items-center"><div className="w-6 h-6 bg-gray-300 text-white rounded-full flex items-center justify-center text-xs font-bold mr-3">3</div><span>General Affairs Process</span></div>
           <div className="flex items-center"><div className="w-6 h-6 bg-gray-300 text-white rounded-full flex items-center justify-center text-xs font-bold mr-3">4</div><span>Device provisioning and setup</span></div>
+          <div className="flex items-center"><div className="w-6 h-6 bg-gray-300 text-white rounded-full flex items-center justify-center text-xs font-bold mr-3">5</div><span>Ready to pick and signoff</span></div>
         </div>
         <p className="text-gray-700 text-sm mt-4">You will receive email notifications at each approval stage. Typical processing time is 3-5 business days.</p>
       </div>
