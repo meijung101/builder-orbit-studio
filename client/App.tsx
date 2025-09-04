@@ -19,6 +19,7 @@ import OfficeSupplyStandard from "./pages/OfficeSupplyStandard";
 import OfficeSupplyNonStandard from "./pages/OfficeSupplyNonStandard";
 import NotFound from "./pages/NotFound";
 import GARequestManagement from "./pages/GARequestManagement";
+import CellPhoneRequest from "./pages/CellPhoneRequest";
 import AccidentIncident from "./pages/AccidentIncident";
 
 
