@@ -42,7 +42,7 @@ const App = () => (
             <Route path="/request/office-supply" element={<OfficeSupplyIndex />} />
             <Route path="/request/office-supply/standard" element={<OfficeSupplyStandard />} />
             <Route path="/request/office-supply/non-standard" element={<OfficeSupplyNonStandard />} />
-            <Route path="/request/cellphone" element={<RequestSelect />} />
+            <Route path="/request/cellphone" element={<CellPhoneRequest />} />
             <Route path="/request/office-supply" element={<RequestSelect />} />
             <Route path="/requests" element={<MyRequests />} />
             <Route path="/requests/pending" element={<MyRequests />} />
