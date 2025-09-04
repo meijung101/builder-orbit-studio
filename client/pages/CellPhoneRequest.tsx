@@ -88,6 +88,26 @@ const CellPhoneRequest = () => {
   const filteredEmployees = sampleEmployees.filter(
     (e) => e.metaProId.toLowerCase().includes(idQuery.toLowerCase()) || e.name.toLowerCase().includes(idQuery.toLowerCase())
   );
+  const commitMetaProId = (value: string) => {
+    setIdQuery(value);
+    if (!value) {
+      setFormData((prev) => ({ ...prev, metaProId: "" }));
+      return;
+    }
+    setFormData((prev) => ({ ...prev, metaProId: value }));
+    const match = sampleEmployees.find((e) => e.metaProId === value);
+    if (match) {
+      setFormData((prev) => ({
+        ...prev,
+        metaProId: match.metaProId,
+        name: match.name,
+        title: match.title,
+        department: match.department,
+        email: match.email,
+        phoneNumber: match.phoneNumber,
+      }));
+    }
+  };
 
   const handleEmployeeSelect = (metaProId: string) => {
     const emp = sampleEmployees.find((e) => e.metaProId === metaProId);
@@ -161,11 +181,18 @@ const CellPhoneRequest = () => {
             onChange={(e) => {
               const v = e.currentTarget.value;
               setIdQuery(v);
-              updateFormData('metaProId', v);
               setShowIdDropdown(true);
             }}
+            onKeyDown={(e)=>{
+              if (e.key === 'Enter') {
+                e.preventDefault();
+                commitMetaProId(idQuery.trim());
+                setShowIdDropdown(false);
+              }
+            }}
             onFocus={() => setShowIdDropdown(true)}
-            onBlur={() => setTimeout(() => setShowIdDropdown(false), 150)}
+            onBlur={() => setTimeout(() => { setShowIdDropdown(false); commitMetaProId(idQuery.trim()); }, 100)}
+            autoComplete="off"
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary"
             placeholder="Search Meta Pro ID or type a new one"
           />
@@ -180,8 +207,7 @@ const CellPhoneRequest = () => {
                   className="p-2 hover:bg-primary/10 cursor-pointer text-sm"
                   onMouseDown={(e) => e.preventDefault()}
                   onClick={() => {
-                    setIdQuery(emp.metaProId);
-                    handleEmployeeSelect(emp.metaProId);
+                    commitMetaProId(emp.metaProId);
                     setShowIdDropdown(false);
                   }}
                 >
@@ -242,7 +268,7 @@ const CellPhoneRequest = () => {
         </div>
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-2">Detailed Explanation <span className="text-sm text-gray-500">(who, how often, why needed)</span></label>
-          <textarea value={formData.reasonDetails} onChange={(e) => updateFormData('reasonDetails', e.currentTarget.value)} rows={4} className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Please provide detailed explanation of why you need a company cell phone, including who you need to contact, how often, and business justification..." />
+          <textarea value={formData.reasonDetails} onInput={(e) => updateFormData('reasonDetails', (e.target as HTMLTextAreaElement).value)} onChange={(e) => updateFormData('reasonDetails', e.currentTarget.value)} rows={4} className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Please provide detailed explanation of why you need a company cell phone, including who you need to contact, how often, and business justification..." />
         </div>
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-3">Preferred Phone Type *</label>
@@ -342,7 +368,7 @@ const CellPhoneRequest = () => {
         </label>
         <div className="mt-6">
           <label className="block text-sm font-medium text-gray-700 mb-2">Electronic Signature *</label>
-          <input type="text" value={formData.signature} onChange={(e) => updateFormData('signature', e.currentTarget.value)} className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Type your full name to sign electronically" />
+          <input type="text" value={formData.signature} onInput={(e) => updateFormData('signature', (e.target as HTMLInputElement).value)} onChange={(e) => updateFormData('signature', e.currentTarget.value)} className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-primary" placeholder="Type your full name to sign electronically" />
           <p className="text-xs text-gray-500 mt-1">By typing your name above, you agree that this constitutes your electronic signature.</p>
         </div>
       </div>
