@@ -587,6 +587,7 @@ const NewRequest: React.FC = () => {
   const [activeTraveler, setActiveTraveler] = useState(0);
   const [step, setStep] = useState(0);
   const [flightHotelDetails, setFlightHotelDetails] = useState<any[]>([]);
+  const [travelerTab, setTravelerTab] = useState<"personal"|"itinerary"|"costs">("personal");
 
   const historyRef = useRef<{ travelers: Traveler[] }[]>([]);
   const pushHistory = () => historyRef.current.push({ travelers: JSON.parse(JSON.stringify(travelers)) });
@@ -681,6 +682,35 @@ const NewRequest: React.FC = () => {
 
   const totalPerDiem = travelers.reduce((sum, t) => sum + (t.locations || []).reduce((s, l) => s + (l.totalPerDiem || 0), 0), 0);
 
+  const active = travelers[activeTraveler] || normalizeTraveler();
+  const patchActiveTraveler = (patch: Partial<Traveler>) => {
+    replaceTraveler(activeTraveler, { ...active, ...patch });
+  };
+  const addLocationActive = () => {
+    const next = [...(active.locations || []), { id: uid(), locationName: "", days: 1, perDiemRate: 0, totalPerDiem: 0 }];
+    const total = next.reduce((s, l) => s + (l.totalPerDiem || 0), 0);
+    patchActiveTraveler({ locations: next as any, totalPerDiem: total });
+  };
+  const updateLocationActive = (idx: number, patch: Partial<Itinerary>) => {
+    const next = [...(active.locations || [])] as Itinerary[];
+    next[idx] = { ...next[idx], ...patch } as Itinerary;
+    if (!next[idx].days || next[idx].days < 0) next[idx].days = 0 as any;
+    next[idx].totalPerDiem = (next[idx].days || 0) * (next[idx].perDiemRate || 0);
+    const total = next.reduce((s, l) => s + (l.totalPerDiem || 0), 0);
+    patchActiveTraveler({ locations: next as any, totalPerDiem: total });
+  };
+  const removeLocationActive = (id: number) => {
+    const next = (active.locations || []).filter((l: any) => l.id !== id) as Itinerary[];
+    const total = next.reduce((s, l) => s + (l.totalPerDiem || 0), 0);
+    patchActiveTraveler({ locations: next as any, totalPerDiem: total });
+  };
+
+  const personalComplete = !!(active.name && active.passportName && active.dob && active.travelStartDate && active.travelEndDate);
+  const itineraryComplete = (active.locations || []).length > 0;
+  const costsComplete = (active.totalPerDiem || 0) > 0;
+  const completedSections = [personalComplete, itineraryComplete, costsComplete].filter(Boolean).length;
+  const progressPct = Math.round((completedSections / 3) * 100);
+
   const goToTravelers = async () => {
     const valid = await methods.trigger(["type", "tripName", "purpose", "tripDetails", "startDate", "endDate", "destination", "approver"]);
     if (valid) setStep(1);
@@ -700,26 +730,75 @@ const NewRequest: React.FC = () => {
 
       <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-12 gap-6 p-6">
         {step === 1 && (
-          <aside className="md:col-span-3 bg-white border rounded-md overflow-hidden h-max">
-            <div className="p-3 border-b flex items-center justify-between">
-              <div className="font-semibold flex items-center gap-2"><Users className="w-5 h-5" /> Travelers</div>
-              <div className="flex items-center gap-2">
-                <button onClick={undo} className="text-gray-600 hover:text-gray-900" title="Undo last change"><Undo className="w-4 h-4" /></button>
-                <button onClick={addTraveler} className="bg-primary text-white px-2 py-1 rounded text-xs flex items-center gap-1"><Plus className="w-4 h-4" /> Add</button>
+          <aside className="md:col-span-3 space-y-4">
+            <div className="bg-white border rounded-md p-4">
+              <div className="flex items-center justify-between mb-3">
+                <div className="font-semibold flex items-center gap-2"><FileText className="w-4 h-4" /> Trip Overview</div>
+              </div>
+              <div className="space-y-3 text-sm">
+                <div>
+                  <div className="text-gray-500">Type</div>
+                  <div className="font-medium capitalize">{methods.getValues().type || "-"}</div>
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <div className="text-gray-500">Dates</div>
+                    <div className="font-medium">{methods.getValues().startDate || "-"} {methods.getValues().endDate ? `- ${methods.getValues().endDate}` : ""}</div>
+                  </div>
+                  <div>
+                    <div className="text-gray-500">Destination</div>
+                    <div className="font-medium">{methods.getValues().destination || "-"}</div>
+                  </div>
+                </div>
               </div>
             </div>
-            <ul>
-              {travelers.map((t,i)=>{
-                const complete = !!(t.name && t.passportName && t.dob && (t.locations||[]).length>0);
-                return (
-                  <li key={t.id} className={`p-3 cursor-pointer flex justify-between items-center ${i===activeTraveler?"bg-primary/10":"hover:bg-gray-50"}`} onClick={()=>setActiveTraveler(i)}>
-                    <span className="truncate max-w-[10rem]" title={t.name || `Traveler ${i+1}`}>{t.name || `Traveler ${i+1}`}</span>
-                    {complete && <Check className="w-4 h-4 text-green-600" />}
-                  </li>
-                );
-              })}
-            </ul>
-            <div className="p-3 border-t text-sm text-gray-600">Total per diem: <strong>{money(totalPerDiem)}</strong></div>
+
+            <div className="bg-white border rounded-md overflow-hidden">
+              <div className="p-3 border-b flex items-center justify-between">
+                <div className="font-semibold flex items-center gap-2"><Users className="w-5 h-5" /> Travelers ({travelers.length})</div>
+                <div className="flex items-center gap-2">
+                  <button onClick={undo} className="text-gray-600 hover:text-gray-900" title="Undo last change"><Undo className="w-4 h-4" /></button>
+                  <button onClick={addTraveler} className="bg-primary text-white px-2 py-1 rounded text-xs flex items-center gap-1"><Plus className="w-4 h-4" /> Add</button>
+                </div>
+              </div>
+              <ul>
+                {travelers.map((t,i)=>{
+                  const personal = !!(t.name && t.passportName && t.dob && t.travelStartDate && t.travelEndDate);
+                  const itin = (t.locations||[]).length>0;
+                  const costs = (t.totalPerDiem||0)>0;
+                  const done = [personal, itin, costs].filter(Boolean).length;
+                  const pct = Math.round((done/3)*100);
+                  return (
+                    <li key={t.id} className={`p-3 cursor-pointer ${i===activeTraveler?"bg-primary/5":"hover:bg-gray-50"}`} onClick={()=>{setActiveTraveler(i); setTravelerTab("personal");}}>
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <div className="font-medium truncate max-w-[12rem]" title={t.name || `Traveler ${i+1}`}>{t.name || `Traveler ${i+1}`}</div>
+                          <div className="text-xs text-gray-500">{t.department || ""}</div>
+                        </div>
+                        <div className="text-xs text-gray-600">{pct}%</div>
+                      </div>
+                      <div className="mt-2 h-2 bg-gray-200 rounded-full">
+                        <div className="h-2 bg-green-600 rounded-full" style={{ width: `${pct}%` }} />
+                      </div>
+                      <div className="mt-2 flex gap-2 text-xs">
+                        <span className={`px-2 py-0.5 rounded-full ${personal?"bg-green-100 text-green-700":"bg-gray-100 text-gray-600"}`}>Personal</span>
+                        <span className={`px-2 py-0.5 rounded-full ${itin?"bg-green-100 text-green-700":"bg-gray-100 text-gray-600"}`}>Dates</span>
+                        <span className={`px-2 py-0.5 rounded-full ${itin?"bg-green-100 text-green-700":"bg-gray-100 text-gray-600"}`}>Locations</span>
+                      </div>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+
+            <div className="bg-white border rounded-md p-4">
+              <div className="font-semibold mb-3">Cost Summary</div>
+              <div className="space-y-2 text-sm">
+                <div className="flex justify-between"><span className="text-gray-600">Base Cost:</span><span className="font-medium">{money(methods.getValues().estimatedCost || 0)}</span></div>
+                <div className="flex justify-between"><span className="text-gray-600">Total Per Diem:</span><span className="font-medium">{money(totalPerDiem)}</span></div>
+                <div className="flex justify-between border-t pt-2 font-semibold"><span>Grand Total:</span><span className="text-primary">{money((methods.getValues().estimatedCost || 0) + totalPerDiem)}</span></div>
+              </div>
+            </div>
           </aside>
         )}
 
@@ -738,10 +817,79 @@ const NewRequest: React.FC = () => {
               {step===1 && (
                 <motion.div key="travelers" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y:0 }} exit={{ opacity: 0, y:-8 }} className="space-y-4">
                   <div className="bg-white border rounded p-6">
-                    {travelers.length===0 ? (
-                      <div className="text-center py-10 text-gray-500">No travelers yet. Click <span className="font-medium">Add</span> to create one.</div>
-                    ) : (
-                      <TravelerFormComponent traveler={travelers[activeTraveler]} onChange={(t)=>replaceTraveler(activeTraveler,t)} onRemove={travelers.length>1?()=>removeTraveler(activeTraveler):undefined} />
+                    <div className="flex items-center justify-between mb-4">
+                      <div>
+                        <h2 className="text-xl font-semibold">{active.name || `Traveler ${activeTraveler + 1}`}</h2>
+                        {active.passportName && <p className="text-sm text-gray-600">Passport: {active.passportName}</p>}
+                      </div>
+                      <span className={`px-2.5 py-1 rounded-full text-xs font-medium ${completedSections===3?"bg-green-100 text-green-700":"bg-gray-100 text-gray-700"}`}>{completedSections===3?"Complete":"In Progress"}</span>
+                    </div>
+                    <div className="flex gap-6 border-b mb-4">
+                      <button className={`pb-2 text-sm font-medium ${travelerTab==='personal'?"text-primary border-b-2 border-primary":"text-gray-600"}`} onClick={()=>setTravelerTab('personal')}>Personal Info {personalComplete && '✓'}</button>
+                      <button className={`pb-2 text-sm font-medium ${travelerTab==='itinerary'?"text-primary border-b-2 border-primary":"text-gray-600"}`} onClick={()=>setTravelerTab('itinerary')}>Itinerary {itineraryComplete && '✓'}</button>
+                      <button className={`pb-2 text-sm font-medium ${travelerTab==='costs'?"text-primary border-b-2 border-primary":"text-gray-600"}`} onClick={()=>setTravelerTab('costs')}>Costs {costsComplete && '✓'}</button>
+                    </div>
+
+                    {travelerTab==='personal' && (
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">Employee</label>
+                          <input className="w-full border rounded p-2" value={active.name || ""} onChange={(e)=>patchActiveTraveler({ name: e.target.value })} placeholder="Search or type name" />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">Department</label>
+                          <input className="w-full border rounded p-2" value={active.department || ""} onChange={(e)=>patchActiveTraveler({ department: e.target.value })} />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">Title</label>
+                          <input className="w-full border rounded p-2" value={active.title || ""} onChange={(e)=>patchActiveTraveler({ title: e.target.value })} />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">Passport Name</label>
+                          <input className="w-full border rounded p-2" value={active.passportName || ""} onChange={(e)=>patchActiveTraveler({ passportName: e.target.value })} />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">Date of Birth</label>
+                          <input type="date" className="w-full border rounded p-2" value={active.dob || ""} onChange={(e)=>patchActiveTraveler({ dob: e.target.value })} />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">Travel Start Date</label>
+                          <input type="date" className="w-full border rounded p-2" value={active.travelStartDate || ""} onChange={(e)=>patchActiveTraveler({ travelStartDate: e.target.value })} />
+                        </div>
+                        <div>
+                          <label className="block text-sm font-medium text-gray-700 mb-1">Travel End Date</label>
+                          <input type="date" className="w-full border rounded p-2" value={active.travelEndDate || ""} onChange={(e)=>patchActiveTraveler({ travelEndDate: e.target.value })} />
+                        </div>
+                      </div>
+                    )}
+
+                    {travelerTab==='itinerary' && (
+                      <div className="space-y-3">
+                        {(active.locations || []).map((loc, idx) => (
+                          <div key={loc.id} className="grid grid-cols-1 md:grid-cols-12 items-center gap-2 border rounded p-3 bg-white">
+                            <select className="md:col-span-6 border p-2 rounded" value={loc.locationName} onChange={(e)=>{
+                              const perDiem = mockLocations.find(l=>l.name===e.target.value)?.perDiem || 0;
+                              updateLocationActive(idx, { locationName: e.target.value, perDiemRate: perDiem });
+                            }}>
+                              <option value="">Select destination...</option>
+                              {mockLocations.map(l=> <option key={l.id} value={l.name}>{l.name} ({money(l.perDiem)}/day)</option>)}
+                            </select>
+                            <input className="md:col-span-2 border p-2 rounded" type="number" min={0} value={loc.days} onChange={(e)=>updateLocationActive(idx, { days: parseInt(e.target.value||'0',10) })} />
+                            <div className="md:col-span-2 border p-2 rounded bg-gray-50">{money(loc.perDiemRate)}</div>
+                            <div className="md:col-span-1 text-right font-semibold">{money(loc.totalPerDiem)}</div>
+                            <button onClick={()=>removeLocationActive(loc.id)} className="md:col-span-1 justify-self-end text-red-600">Remove</button>
+                          </div>
+                        ))}
+                        <button className="px-3 py-1 bg-primary text-white rounded" onClick={addLocationActive}>+ Add Location</button>
+                      </div>
+                    )}
+
+                    {travelerTab==='costs' && (
+                      <div className="space-y-3">
+                        <div className="flex justify-between text-sm"><span className="text-gray-600">Per Diem Total</span><span className="font-semibold">{money(active.totalPerDiem || 0)}</span></div>
+                        <div className="flex justify-between text-sm"><span className="text-gray-600">Trip Base Cost</span><span className="font-semibold">{money(methods.getValues().estimatedCost || 0)}</span></div>
+                        <div className="flex justify-between text-sm border-t pt-2 font-semibold"><span>Traveler Est. Total</span><span className="text-primary">{money((methods.getValues().estimatedCost || 0) + (active.totalPerDiem || 0))}</span></div>
+                      </div>
                     )}
                   </div>
 
