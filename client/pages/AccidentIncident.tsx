@@ -64,8 +64,9 @@ const AccidentIncident = () => {
     switch (step) {
       case 1: {
         if (!formData.carType) newErrors.carType = "Car type is required";
-        if (!formData.acknowledgmentChecked)
+        if (formData.carType === "Manager Lease Car" && !formData.acknowledgmentChecked) {
           newErrors.acknowledgmentChecked = "You must acknowledge the completion of the form";
+        }
         if (formData.carType === "Manager Lease Car" && !formData.externalLinkConfirmation) {
           newErrors.externalLinkConfirmation = "You must confirm submission through the external link";
         }
@@ -171,50 +172,52 @@ const AccidentIncident = () => {
       </div>
 
       {formData.carType === "Manager Lease Car" && (
-        <div className="bg-yellow-50 p-4 rounded-lg border-l-4 border-yellow-500">
-          <h4 className="font-medium text-yellow-900 mb-2">External Submission Required</h4>
-          <p className="text-yellow-800 text-sm mb-3">
-            For Manager Lease Car incidents, you must also submit information through the external Hyundai system.
-          </p>
-          <button
-            onClick={openExternalLink}
-            className="inline-flex items-center px-4 py-2 bg-primary text-white rounded-lg hover:opacity-90 transition-colors"
-          >
-            <ExternalLink className="w-4 h-4 mr-2" />
-            Submit to Hyundai Portal
-          </button>
+        <>
+          <div className="bg-yellow-50 p-4 rounded-lg border-l-4 border-yellow-500">
+            <h4 className="font-medium text-yellow-900 mb-2">External Submission Required</h4>
+            <p className="text-yellow-800 text-sm mb-3">
+              For Manager Lease Car incidents, you must also submit information through the external Hyundai system.
+            </p>
+            <button
+              onClick={openExternalLink}
+              className="inline-flex items-center px-4 py-2 bg-primary text-white rounded-lg hover:opacity-90 transition-colors"
+            >
+              <ExternalLink className="w-4 h-4 mr-2" />
+              Submit to Hyundai Portal
+            </button>
 
-          <div className="mt-4">
-            <label className="flex items-center">
+            <div className="mt-4">
+              <label className="flex items-center">
+                <input
+                  type="checkbox"
+                  checked={formData.externalLinkConfirmation}
+                  onChange={(e) => handleInputChange("externalLinkConfirmation", e.target.checked)}
+                  className="mr-2"
+                />
+                <span className="text-sm">I hereby confirm that I have submitted the Accident/Incident Report through the link.</span>
+              </label>
+              {errors.externalLinkConfirmation && (
+                <p className="text-red-500 text-sm mt-1">{errors.externalLinkConfirmation}</p>
+              )}
+            </div>
+          </div>
+
+          <div className="bg-gray-50 p-4 rounded-lg mt-4">
+            <label className="flex items-start">
               <input
                 type="checkbox"
-                checked={formData.externalLinkConfirmation}
-                onChange={(e) => handleInputChange("externalLinkConfirmation", e.target.checked)}
-                className="mr-2"
+                checked={formData.acknowledgmentChecked}
+                onChange={(e) => handleInputChange("acknowledgmentChecked", e.target.checked)}
+                className="mt-1 mr-3"
               />
-              <span className="text-sm">I hereby confirm that I have submitted the Accident/Incident Report through the link.</span>
+              <span className="text-sm">I hereby confirm that I have completed the Accident-Incident Form *</span>
             </label>
-            {errors.externalLinkConfirmation && (
-              <p className="text-red-500 text-sm mt-1">{errors.externalLinkConfirmation}</p>
+            {errors.acknowledgmentChecked && (
+              <p className="text-red-500 text-sm mt-1">{errors.acknowledgmentChecked}</p>
             )}
           </div>
-        </div>
+        </>
       )}
-
-      <div className="bg-gray-50 p-4 rounded-lg">
-        <label className="flex items-start">
-          <input
-            type="checkbox"
-            checked={formData.acknowledgmentChecked}
-            onChange={(e) => handleInputChange("acknowledgmentChecked", e.target.checked)}
-            className="mt-1 mr-3"
-          />
-          <span className="text-sm">I hereby confirm that I have completed the Accident-Incident Form *</span>
-        </label>
-        {errors.acknowledgmentChecked && (
-          <p className="text-red-500 text-sm mt-1">{errors.acknowledgmentChecked}</p>
-        )}
-      </div>
     </div>
   );
 
