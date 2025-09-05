@@ -21,6 +21,7 @@ import NotFound from "./pages/NotFound";
 import GARequestManagement from "./pages/GARequestManagement";
 import CellPhoneRequest from "./pages/CellPhoneRequest";
 import AccidentIncident from "./pages/AccidentIncident";
+import BusinessCard from "./pages/BusinessCard";
 
 
 const App = () => (
@@ -35,7 +36,8 @@ const App = () => (
             <Route path="/request/select" element={<RequestSelect />} />
             <Route path="/request/new" element={<NewRequest />} />
             <Route path="/request/accident" element={<AccidentIncident />} />
-            <Route path="/request/business-car" element={<RequestSelect />} />
+            <Route path="/request/business-car" element={<BusinessCard />} />
+            <Route path="/request/business-card" element={<BusinessCard />} />
             <Route path="/request/expense" element={<RequestSelect />} />
             <Route path="/request/bereavement" element={<Bereavement />} />
             <Route path="/request/mail" element={<ShippingRequest />} />
