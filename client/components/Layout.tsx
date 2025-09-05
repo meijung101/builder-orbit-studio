@@ -174,6 +174,16 @@ export default function Layout({ children }: LayoutProps) {
         <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-white border-r px-6 pb-4">
           <div className="flex h-16 shrink-0 items-center border-b">
             <h1 className="text-2xl font-bold text-primary">HMGMA BPMS</h1>
+            <Button
+              variant="ghost"
+              size="sm"
+              className="ml-auto"
+              onClick={() => setSidebarCollapsed((v) => !v)}
+              title={sidebarCollapsed ? "Show sidebar" : "Hide sidebar"}
+              aria-label={sidebarCollapsed ? "Show sidebar" : "Hide sidebar"}
+            >
+              <Menu className="h-5 w-5" />
+            </Button>
           </div>
           <nav className="flex flex-1 flex-col">
             <ul className="flex flex-1 flex-col gap-y-2">
@@ -274,13 +284,6 @@ export default function Layout({ children }: LayoutProps) {
             <Menu className="h-5 w-5" />
           </Button>
           <h1 className="text-xl font-semibold text-primary">HMGMA BPMS</h1>
-        </div>
-        {/* Top bar for desktop with collapse toggle */}
-        <div className="sticky top-0 z-40 hidden lg:flex h-14 shrink-0 items-center gap-x-4 border-b bg-white px-4 shadow-sm">
-          <Button variant="ghost" size="sm" onClick={() => setSidebarCollapsed((v)=>!v)} title={sidebarCollapsed ? "Show sidebar" : "Hide sidebar"}>
-            <Menu className="h-5 w-5" />
-          </Button>
-          <h1 className="text-lg font-semibold text-primary">HMGMA BPMS</h1>
         </div>
 
         {/* Page content */}
