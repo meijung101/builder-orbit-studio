@@ -750,6 +750,9 @@ const NewRequest: React.FC = () => {
             <div className="bg-white border rounded-md p-4">
               <div className="flex items-center justify-between mb-3">
                 <div className="font-semibold flex items-center gap-2"><FileText className="w-4 h-4" /> Trip Overview</div>
+                <button className="text-primary hover:text-primary/80" title="Edit overview" onClick={()=>setStep(0)}>
+                  <Pencil className="w-4 h-4" />
+                </button>
               </div>
               <div className="space-y-3 text-sm">
                 <div>
