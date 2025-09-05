@@ -1,6 +1,16 @@
 import React, { useState, useEffect } from 'react';
 import { ChevronRight, ChevronLeft, User, Phone, FileText, Eye, CheckCircle, Clock, AlertCircle, Upload, X } from 'lucide-react';
 
+const MOCK_EMPLOYEES = [
+  { id: "EMP001234", name: "Sarah Johnson", title: "Senior Software Engineer", department: "Information Technology" },
+  { id: "EMP002345", name: "John Smith", title: "QA Analyst", department: "Quality Assurance" },
+  { id: "EMP003456", name: "Priya Patel", title: "Product Designer", department: "Design" },
+  { id: "EMP004567", name: "Michael Chen", title: "Assistant Manager", department: "Operations" },
+  { id: "EMP005678", name: "Emily Davis", title: "Coordinator", department: "General Affairs" },
+  { id: "EMP006789", name: "David Park", title: "Team Lead", department: "Maintenance" },
+  { id: "EMP007890", name: "Liam Brown", title: "HR Specialist", department: "Human Resources" }
+];
+
 const SAMPLE_USER = {
   metaProId: "EMP001234",
   fullName: "Sarah Johnson",
@@ -33,6 +43,12 @@ const BusinessCard: React.FC = () => {
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [empQuery, setEmpQuery] = useState<string>("");
+  const [empOpen, setEmpOpen] = useState<boolean>(false);
+
+  useEffect(() => {
+    setEmpQuery(formData.metaProId ? `${formData.metaProId} — ${formData.fullName}` : "");
+  }, [formData.metaProId, formData.fullName]);
 
   const steps = [
     { id: 1, title: "Basic Info", icon: User },
@@ -97,10 +113,39 @@ const BusinessCard: React.FC = () => {
           <div className="space-y-6">
             <h2 className="text-2xl font-bold text-gray-900">Basic Information</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
+              <div className="relative">
                 <label className="block text-sm font-medium text-gray-700 mb-2">Meta Pro ID</label>
-                <input type="text" value={formData.metaProId} disabled className="w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-gray-500" />
-                <p className="text-xs text-gray-500 mt-1">Auto-populated</p>
+                <input
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary focus:border-primary"
+                  value={empQuery}
+                  onChange={(e) => { setEmpQuery(e.target.value); setEmpOpen(true); }}
+                  onFocus={() => setEmpOpen(true)}
+                  onBlur={() => setTimeout(() => setEmpOpen(false), 150)}
+                  placeholder="Type ID or name..."
+                />
+                {empOpen && (
+                  <ul className="absolute z-10 bg-white border rounded shadow mt-1 max-h-48 overflow-y-auto w-full">
+                    {MOCK_EMPLOYEES.filter(e => (empQuery||"").toLowerCase() && (e.id.toLowerCase().includes(empQuery.toLowerCase()) || e.name.toLowerCase().includes(empQuery.toLowerCase()))).map(emp => (
+                      <li
+                        key={emp.id}
+                        className="p-2 hover:bg-primary/10 cursor-pointer text-sm"
+                        onMouseDown={(e)=> e.preventDefault()}
+                        onClick={() => {
+                          setFormData((prev:any) => ({ ...prev, metaProId: emp.id, fullName: emp.name, title: emp.title, department: emp.department }));
+                          setEmpQuery(`${emp.id} — ${emp.name}`);
+                          setEmpOpen(false);
+                        }}
+                      >
+                        <div className="font-medium">{emp.id} — {emp.name}</div>
+                        <div className="text-gray-600 text-xs">{emp.department} • {emp.title}</div>
+                      </li>
+                    ))}
+                    {empQuery && MOCK_EMPLOYEES.filter(e => e.id.toLowerCase().includes(empQuery.toLowerCase()) || e.name.toLowerCase().includes(empQuery.toLowerCase())).length === 0 && (
+                      <li className="p-2 text-sm text-gray-500">No matches</li>
+                    )}
+                  </ul>
+                )}
+                <p className="text-xs text-gray-500 mt-1">Search by ID or name</p>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
@@ -283,7 +328,7 @@ const BusinessCard: React.FC = () => {
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Business Card Request System</h1>
+          <h1 className="text-3xl font-bold text-gray-900">Business Card Request</h1>
           <p className="mt-2 text-gray-600">Submit your business card request and track approval status</p>
         </div>
         <div className="mb-8">
