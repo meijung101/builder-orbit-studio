@@ -698,6 +698,10 @@ const NewRequest: React.FC = () => {
   useEffect(() => {
     setEmployeeQuery(active.metaProId ? `${active.metaProId} — ${active.name}` : (active.name || ""));
   }, [active.metaProId, active.name, activeTraveler]);
+
+  useEffect(() => {
+    setEmployeeQuery(active.metaProId ? `${active.metaProId} — ${active.name}` : (active.name || ""));
+  }, [active.metaProId, active.name, activeTraveler]);
   const addLocationActive = () => {
     const next = [...(active.locations || []), { id: uid(), locationName: "", days: 1, perDiemRate: 0, totalPerDiem: 0 }];
     const total = next.reduce((s, l) => s + (l.totalPerDiem || 0), 0);
