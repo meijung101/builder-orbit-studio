@@ -22,6 +22,7 @@ import {
   Undo,
   Car,
   Bed,
+  Pencil,
 } from "lucide-react";
 
 /*************************
