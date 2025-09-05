@@ -21,6 +21,7 @@ import NotFound from "./pages/NotFound";
 import GARequestManagement from "./pages/GARequestManagement";
 import CellPhoneRequest from "./pages/CellPhoneRequest";
 import AccidentIncident from "./pages/AccidentIncident";
+import ExpenseReport from "./pages/ExpenseReport";
 import BusinessCard from "./pages/BusinessCard";
 
 
@@ -38,7 +39,7 @@ const App = () => (
             <Route path="/request/accident" element={<AccidentIncident />} />
             <Route path="/request/business-car" element={<BusinessCard />} />
             <Route path="/request/business-card" element={<BusinessCard />} />
-            <Route path="/request/expense" element={<RequestSelect />} />
+            <Route path="/request/expense" element={<ExpenseReport />} />
             <Route path="/request/bereavement" element={<Bereavement />} />
             <Route path="/request/mail" element={<ShippingRequest />} />
             <Route path="/request/office-supply" element={<OfficeSupplyIndex />} />
