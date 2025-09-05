@@ -528,6 +528,33 @@ const ExpenseReport: React.FC = () => {
           </div>
         </div>
       </div>
+      <div className="bg-white p-6 rounded-lg border">
+        <h4 className="font-medium mb-4">Final Approval Path</h4>
+        <div className="flex items-center space-x-4 overflow-x-auto">
+          <div className="flex flex-col items-center">
+            <div className="p-2 border rounded bg-gray-50">Requester</div>
+            <span className="mt-1 text-xs px-2 py-0.5 rounded bg-primary/10 text-primary">Submitted</span>
+          </div>
+          { (formData.coDepartments || []).map((dept: string) => (
+            <React.Fragment key={dept}>
+              <span className="text-gray-400">→</span>
+              <div className="flex flex-col items-center">
+                <div className="p-2 border rounded bg-gray-50">{dept}</div>
+                <span className="mt-1 text-xs px-2 py-0.5 rounded bg-gray-200 text-gray-700">Pending</span>
+              </div>
+            </React.Fragment>
+          )) }
+          { formData.finalApprover && (
+            <>
+              <span className="text-gray-400">→</span>
+              <div className="flex flex-col items-center">
+                <div className="p-2 border rounded bg-gray-50">{formData.finalApprover}</div>
+                <span className="mt-1 text-xs px-2 py-0.5 rounded bg-gray-200 text-gray-700">Pending</span>
+              </div>
+            </>
+          ) }
+        </div>
+      </div>
       <div className="bg-primary/5 p-4 rounded-lg border border-primary/20">
         <div className="flex items-start gap-2">
           <AlertCircle className="w-5 h-5 text-primary mt-0.5" />
