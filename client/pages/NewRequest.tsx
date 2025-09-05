@@ -594,6 +594,8 @@ const NewRequest: React.FC = () => {
   const [travelerTab, setTravelerTab] = useState<"personal"|"itinerary"|"costs">("personal");
   const [employeeQuery, setEmployeeQuery] = useState("");
   const [employeeOpen, setEmployeeOpen] = useState(false);
+  const [employeeQuery, setEmployeeQuery] = useState("");
+  const [employeeOpen, setEmployeeOpen] = useState(false);
 
   const historyRef = useRef<{ travelers: Traveler[] }[]>([]);
   const pushHistory = () => historyRef.current.push({ travelers: JSON.parse(JSON.stringify(travelers)) });
