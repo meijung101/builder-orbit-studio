@@ -22,7 +22,6 @@ import {
   Undo,
   Car,
   Bed,
-  Pencil,
 } from "lucide-react";
 
 /*************************
@@ -743,30 +742,6 @@ const NewRequest: React.FC = () => {
       <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-12 gap-6 p-6">
         {step === 1 && (
           <aside className="md:col-span-3 space-y-4">
-            <div className="bg-white border rounded-md p-4">
-              <div className="flex items-center justify-between mb-3">
-                <div className="font-semibold flex items-center gap-2"><FileText className="w-4 h-4" /> Trip Overview</div>
-                <button className="text-primary hover:text-primary/80" title="Edit overview" onClick={()=>setStep(0)}>
-                  <Pencil className="w-4 h-4" />
-                </button>
-              </div>
-              <div className="space-y-3 text-sm">
-                <div>
-                  <div className="text-gray-500">Type</div>
-                  <div className="font-medium capitalize">{methods.getValues().type || "-"}</div>
-                </div>
-                <div className="grid grid-cols-2 gap-3">
-                  <div>
-                    <div className="text-gray-500">Dates</div>
-                    <div className="font-medium">{methods.getValues().startDate || "-"} {methods.getValues().endDate ? `- ${methods.getValues().endDate}` : ""}</div>
-                  </div>
-                  <div>
-                    <div className="text-gray-500">Destination</div>
-                    <div className="font-medium">{methods.getValues().destination || "-"}</div>
-                  </div>
-                </div>
-              </div>
-            </div>
 
             <div className="bg-white border rounded-md overflow-hidden">
               <div className="p-3 border-b flex items-center justify-between">
