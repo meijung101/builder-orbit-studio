@@ -44,6 +44,7 @@ const navigation: NavItem[] = [
 
 export default function Layout({ children }: LayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [requestDialogOpen, setRequestDialogOpen] = useState(false);
   const [myReqOpen, setMyReqOpen] = useState(false);
   const [gaOpen, setGaOpen] = useState(false);
@@ -169,7 +170,7 @@ export default function Layout({ children }: LayoutProps) {
       </div>
 
       {/* Desktop sidebar */}
-      <div className="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col">
+      <div className={cn(sidebarCollapsed ? "hidden" : "hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col") }>
         <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-white border-r px-6 pb-4">
           <div className="flex h-16 shrink-0 items-center border-b">
             <h1 className="text-2xl font-bold text-primary">HMGMA BPMS</h1>
@@ -266,13 +267,20 @@ export default function Layout({ children }: LayoutProps) {
       </div>
 
       {/* Main content */}
-      <div className="lg:pl-72">
+      <div className={cn(sidebarCollapsed ? "lg:pl-0" : "lg:pl-72") }>
         {/* Top bar for mobile */}
         <div className="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-x-4 border-b bg-white px-4 shadow-sm lg:hidden">
           <Button variant="ghost" size="sm" onClick={() => setSidebarOpen(true)}>
             <Menu className="h-5 w-5" />
           </Button>
           <h1 className="text-xl font-semibold text-primary">HMGMA BPMS</h1>
+        </div>
+        {/* Top bar for desktop with collapse toggle */}
+        <div className="sticky top-0 z-40 hidden lg:flex h-14 shrink-0 items-center gap-x-4 border-b bg-white px-4 shadow-sm">
+          <Button variant="ghost" size="sm" onClick={() => setSidebarCollapsed((v)=>!v)} title={sidebarCollapsed ? "Show sidebar" : "Hide sidebar"}>
+            <Menu className="h-5 w-5" />
+          </Button>
+          <h1 className="text-lg font-semibold text-primary">HMGMA BPMS</h1>
         </div>
 
         {/* Page content */}
