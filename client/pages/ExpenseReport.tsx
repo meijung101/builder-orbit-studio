@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { ChevronRight, ChevronLeft, Plus, Trash2, Upload, Download, Search, Check, AlertCircle } from "lucide-react";
+import ApprovalWorkflow from "../components/ApprovalWorkflow";
 
 const reimbursementTypes = ["Travel", "General", "General with WBS/FUND"] as const;
 const expenseTypes = [
@@ -74,6 +75,8 @@ const ExpenseReport: React.FC = () => {
     mileageRows: [] as any[],
     businessMealRows: [] as any[],
     uploadedDocuments: [] as string[],
+    finalApprover: "",
+    coDepartments: [] as string[],
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [total, setTotal] = useState(0);
@@ -82,7 +85,8 @@ const ExpenseReport: React.FC = () => {
     { id: 1, name: "Request Details", icon: "📋" },
     { id: 2, name: "Payee Information", icon: "👤" },
     { id: 3, name: "Expense Details", icon: "💰" },
-    { id: 4, name: "Review & Submit", icon: "✅" },
+    { id: 4, name: "Approval Workflow", icon: "🗳️" },
+    { id: 5, name: "Review & Submit", icon: "✅" },
   ];
 
   useEffect(() => {
@@ -495,7 +499,7 @@ const ExpenseReport: React.FC = () => {
     </div>
   );
 
-  const renderStep4 = () => (
+  const renderStep5 = () => (
     <div className="space-y-6">
       <h3 className="text-lg font-semibold mb-4">Review & Submit</h3>
       <div className="bg-white p-6 rounded-lg border">
@@ -544,7 +548,17 @@ const ExpenseReport: React.FC = () => {
     if (currentStep === 1) return renderStep1();
     if (currentStep === 2) return renderStep2();
     if (currentStep === 3) return renderStep3();
-    if (currentStep === 4) return renderStep4();
+    if (currentStep === 4) return (
+      <div className="space-y-6">
+        <h3 className="text-lg font-semibold mb-4">Approval Workflow</h3>
+        <ApprovalWorkflow
+          finalApprover={formData.finalApprover}
+          coDepartments={formData.coDepartments}
+          onChange={(next)=> setFormData((prev:any)=> ({ ...prev, ...next }))}
+        />
+      </div>
+    );
+    if (currentStep === 5) return renderStep5();
     return null;
   };
 
