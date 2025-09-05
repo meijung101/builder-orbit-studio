@@ -765,7 +765,16 @@ const NewRequest: React.FC = () => {
                           <div className="font-medium truncate max-w-[12rem]" title={t.name || `Traveler ${i+1}`}>{t.name || `Traveler ${i+1}`}</div>
                           <div className="text-xs text-gray-500">{t.department || ""}</div>
                         </div>
-                        <div className="text-xs text-gray-600">{pct}%</div>
+                        <div className="flex items-center gap-2">
+                          <div className="text-xs text-gray-600">{pct}%</div>
+                          <button
+                            title="Delete traveler"
+                            className={`text-red-600 hover:text-red-700 ${travelers.length<=1 ? "opacity-40 cursor-not-allowed" : ""}`}
+                            onClick={(e)=>{ e.stopPropagation(); if (travelers.length<=1) return; if (confirm("Delete this traveler?")) removeTraveler(i); }}
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
                       </div>
                       <div className="mt-2 h-2 bg-gray-200 rounded-full">
                         <div className="h-2 bg-green-600 rounded-full" style={{ width: `${pct}%` }} />
