@@ -286,6 +286,21 @@ export default function Layout({ children }: LayoutProps) {
           <h1 className="text-xl font-semibold text-primary">HMGMA BPMS</h1>
         </div>
 
+        {sidebarCollapsed && (
+          <div className="hidden lg:block px-4 py-2">
+            <Button
+              variant="ghost"
+              size="sm"
+              className="border bg-white shadow"
+              onClick={() => setSidebarCollapsed(false)}
+              title="Show sidebar"
+              aria-label="Show sidebar"
+            >
+              <Menu className="h-5 w-5" />
+            </Button>
+          </div>
+        )}
+
         {/* Page content */}
         <main className="py-6">
           <div className="px-4 sm:px-6 lg:px-8">
