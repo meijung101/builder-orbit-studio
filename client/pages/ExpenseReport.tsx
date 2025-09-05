@@ -565,8 +565,8 @@ const ExpenseReport: React.FC = () => {
         </div>
       </div>
       <div className="flex gap-3">
-        <button onClick={() => alert('Form submitted successfully!')} className="flex-1 px-6 py-3 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors font-medium">Submit Expense Report</button>
         <button onClick={() => alert('PDF download would be triggered here')} className="px-6 py-3 bg-white border text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium flex items-center gap-2"><Download className="w-4 h-4" /> Download PDF</button>
+        <button onClick={() => alert('Form submitted successfully!')} className="px-6 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors font-medium">Submit Expense Report</button>
       </div>
     </div>
   );
