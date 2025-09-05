@@ -531,9 +531,11 @@ const ReviewScreen: React.FC<{ trip: TripForm; travelers: Traveler[]; onEditTrav
       })}
 
       <div className="flex flex-wrap gap-3 print:hidden">
-        <button onClick={onSubmit} className="px-4 py-2 bg-green-600 text-white rounded flex items-center gap-2"><Send className="w-4 h-4" /> Submit for Approval</button>
-        <button onClick={onExportCSV} className="px-4 py-2 bg-gray-800 text-white rounded flex items-center gap-2"><Download className="w-4 h-4" /> Export CSV</button>
-        <button onClick={() => window.print()} className="px-4 py-2 bg-white border rounded flex items-center gap-2"><FileText className="w-4 h-4" /> Print / Save PDF</button>
+        <div className="flex gap-3">
+          <button onClick={onExportCSV} className="px-4 py-2 bg-gray-800 text-white rounded flex items-center gap-2"><Download className="w-4 h-4" /> Export CSV</button>
+          <button onClick={() => window.print()} className="px-4 py-2 bg-white border rounded flex items-center gap-2"><FileText className="w-4 h-4" /> Print / Save PDF</button>
+        </div>
+        <button onClick={onSubmit} className="ml-auto px-4 py-2 bg-green-600 text-white rounded flex items-center gap-2"><Send className="w-4 h-4" /> Submit for Approval</button>
       </div>
     </div>
   );
