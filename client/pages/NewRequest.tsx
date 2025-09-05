@@ -31,6 +31,9 @@ const mockEmployees = [
   { id: "E001", name: "John Smith", department: "Engineering", title: "Senior Engineer", costCenter: "ENG-001" },
   { id: "E002", name: "Sarah Johnson", department: "Quality", title: "QC Manager", costCenter: "QLT-014" },
   { id: "E003", name: "Priya Patel", department: "Design", title: "Product Designer", costCenter: "DSN-003" },
+  { id: "E004", name: "Michael Chen", department: "Operations", title: "Assistant Manager", costCenter: "OPS-022" },
+  { id: "E005", name: "Emily Davis", department: "General Affairs", title: "Coordinator", costCenter: "GA-005" },
+  { id: "E006", name: "David Park", department: "Maintenance", title: "Team Lead", costCenter: "MTN-011" },
 ];
 
 const mockLocations = [
@@ -588,6 +591,8 @@ const NewRequest: React.FC = () => {
   const [step, setStep] = useState(0);
   const [flightHotelDetails, setFlightHotelDetails] = useState<any[]>([]);
   const [travelerTab, setTravelerTab] = useState<"personal"|"itinerary"|"costs">("personal");
+  const [employeeQuery, setEmployeeQuery] = useState("");
+  const [employeeOpen, setEmployeeOpen] = useState(false);
 
   const historyRef = useRef<{ travelers: Traveler[] }[]>([]);
   const pushHistory = () => historyRef.current.push({ travelers: JSON.parse(JSON.stringify(travelers)) });
@@ -686,6 +691,10 @@ const NewRequest: React.FC = () => {
   const patchActiveTraveler = (patch: Partial<Traveler>) => {
     replaceTraveler(activeTraveler, { ...active, ...patch });
   };
+
+  useEffect(() => {
+    setEmployeeQuery(active.metaProId ? `${active.metaProId} — ${active.name}` : (active.name || ""));
+  }, [active.metaProId, active.name, activeTraveler]);
   const addLocationActive = () => {
     const next = [...(active.locations || []), { id: uid(), locationName: "", days: 1, perDiemRate: 0, totalPerDiem: 0 }];
     const total = next.reduce((s, l) => s + (l.totalPerDiem || 0), 0);
@@ -727,18 +736,6 @@ const NewRequest: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       <Stepper step={step} setStep={(n:number)=>setStep(n)} canNext={true} />
-
-      <div className="max-w-7xl mx-auto px-6 mt-4">
-        <div className="bg-primary text-white p-6 rounded-lg shadow">
-          <div className="flex items-center gap-3">
-            <Plane className="w-8 h-8" />
-            <div>
-              <h1 className="text-2xl font-bold">Trip Request Form</h1>
-              <p className="text-primary/20">Create, manage, and submit travel requests</p>
-            </div>
-          </div>
-        </div>
-      </div>
 
       <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-12 gap-6 p-6">
         {step === 1 && (
@@ -844,9 +841,33 @@ const NewRequest: React.FC = () => {
 
                     {travelerTab==='personal' && (
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
+                        <div className="relative">
                           <label className="block text-sm font-medium text-gray-700 mb-1">Employee</label>
-                          <input className="w-full border rounded p-2" value={active.name || ""} onChange={(e)=>patchActiveTraveler({ name: e.target.value })} placeholder="Search or type name" />
+                          <input
+                            className="w-full border rounded p-2"
+                            value={employeeQuery}
+                            onChange={(e)=>{ setEmployeeQuery(e.target.value); setEmployeeOpen(true); }}
+                            onFocus={()=> setEmployeeOpen(true)}
+                            onBlur={()=> setTimeout(()=> setEmployeeOpen(false), 150)}
+                            placeholder="Type name or ID..."
+                          />
+                          {employeeOpen && (
+                            <ul className="absolute z-10 bg-white border rounded shadow mt-1 max-h-48 overflow-y-auto w-full">
+                              {(mockEmployees.filter(e => (employeeQuery||"").toLowerCase() && (e.name.toLowerCase().includes(employeeQuery.toLowerCase()) || e.id.toLowerCase().includes(employeeQuery.toLowerCase())))).map(emp => (
+                                <li key={emp.id}
+                                  className="p-2 hover:bg-primary/10 cursor-pointer text-sm"
+                                  onMouseDown={(e)=> e.preventDefault()}
+                                  onClick={()=>{ patchActiveTraveler({ name: emp.name, department: emp.department, title: emp.title, costCenter: emp.costCenter, metaProId: emp.id }); setEmployeeQuery(`${emp.id} — ${emp.name}`); setEmployeeOpen(false); }}
+                                >
+                                  <div className="font-medium">{emp.id} — {emp.name}</div>
+                                  <div className="text-gray-600 text-xs">{emp.department} • {emp.title}</div>
+                                </li>
+                              ))}
+                              {employeeQuery && (mockEmployees.filter(e => e.name.toLowerCase().includes(employeeQuery.toLowerCase()) || e.id.toLowerCase().includes(employeeQuery.toLowerCase()))).length === 0 && (
+                                <li className="p-2 text-sm text-gray-500">No matches</li>
+                              )}
+                            </ul>
+                          )}
                         </div>
                         <div>
                           <label className="block text-sm font-medium text-gray-700 mb-1">Department</label>
@@ -887,7 +908,7 @@ const NewRequest: React.FC = () => {
                               {mockLocations.map(l=> <option key={l.id} value={l.name}>{l.name} ({money(l.perDiem)}/day)</option>)}
                             </select>
                             <input className="md:col-span-3 border p-2 rounded" type="number" min={0} value={loc.days} onChange={(e)=>updateLocationActive(idx, { days: parseInt(e.target.value||'0',10) })} />
-                            <button onClick={()=>removeLocationActive(loc.id)} className="md:col-span-1 justify-self-end text-red-600">Remove</button>
+                            <button onClick={()=>removeLocationActive(loc.id)} className="md:col-span-1 justify-self-end text-red-600"><Trash2 className="w-4 h-4" /></button>
                           </div>
                         ))}
                         <button className="px-3 py-1 bg-primary text-white rounded" onClick={addLocationActive}>+ Add Location</button>
@@ -930,7 +951,7 @@ const NewRequest: React.FC = () => {
                               <input type="time" className="border p-2 rounded" value={c.pickupTime || ''} onChange={(e)=>patchActiveTraveler({ rentalCars: (active.rentalCars || []).map((x:any,i:number)=> i===idx ? { ...x, pickupTime: e.target.value } : x) })} />
                               <input type="date" className="border p-2 rounded" value={c.dropoffDate || ''} onChange={(e)=>patchActiveTraveler({ rentalCars: (active.rentalCars || []).map((x:any,i:number)=> i===idx ? { ...x, dropoffDate: e.target.value } : x) })} />
                               <input type="time" className="border p-2 rounded" value={c.dropoffTime || ''} onChange={(e)=>patchActiveTraveler({ rentalCars: (active.rentalCars || []).map((x:any,i:number)=> i===idx ? { ...x, dropoffTime: e.target.value } : x) })} />
-                              <button onClick={()=>patchActiveTraveler({ rentalCars: (active.rentalCars || []).filter((_:any,i:number)=> i!==idx) })} className="text-red-600">Remove</button>
+                              <button onClick={()=>patchActiveTraveler({ rentalCars: (active.rentalCars || []).filter((_:any,i:number)=> i!==idx) })} className="text-red-600 justify-self-end"><Trash2 className="w-4 h-4" /></button>
                             </div>
                           ))}
                           <button className="px-3 py-1 bg-primary text-white rounded" onClick={()=>patchActiveTraveler({ rentalCars: [...(active.rentalCars||[]), { id: uid(), pickup: '', dropoff: '', pickupDate: '', pickupTime: '', dropoffDate: '', dropoffTime: '' }] })}>+ Add Rental Car</button>
