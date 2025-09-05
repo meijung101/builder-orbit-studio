@@ -597,6 +597,8 @@ const NewRequest: React.FC = () => {
   const [employeeQuery, setEmployeeQuery] = useState("");
   const [employeeOpen, setEmployeeOpen] = useState(false);
 
+  useEffect(() => { setStep(0); }, []);
+
   const historyRef = useRef<{ travelers: Traveler[] }[]>([]);
   const pushHistory = () => historyRef.current.push({ travelers: JSON.parse(JSON.stringify(travelers)) });
   const undo = () => {
