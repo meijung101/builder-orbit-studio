@@ -594,8 +594,6 @@ const NewRequest: React.FC = () => {
   const [travelerTab, setTravelerTab] = useState<"personal"|"itinerary"|"costs">("personal");
   const [employeeQuery, setEmployeeQuery] = useState("");
   const [employeeOpen, setEmployeeOpen] = useState(false);
-  const [employeeQuery, setEmployeeQuery] = useState("");
-  const [employeeOpen, setEmployeeOpen] = useState(false);
 
   useEffect(() => { setStep(0); }, []);
 
