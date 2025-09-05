@@ -864,23 +864,73 @@ const NewRequest: React.FC = () => {
                     )}
 
                     {travelerTab==='itinerary' && (
-                      <div className="space-y-3">
+                      <div className="space-y-4">
                         {(active.locations || []).map((loc, idx) => (
                           <div key={loc.id} className="grid grid-cols-1 md:grid-cols-12 items-center gap-2 border rounded p-3 bg-white">
-                            <select className="md:col-span-6 border p-2 rounded" value={loc.locationName} onChange={(e)=>{
+                            <select className="md:col-span-8 border p-2 rounded" value={loc.locationName} onChange={(e)=>{
                               const perDiem = mockLocations.find(l=>l.name===e.target.value)?.perDiem || 0;
                               updateLocationActive(idx, { locationName: e.target.value, perDiemRate: perDiem });
                             }}>
                               <option value="">Select destination...</option>
                               {mockLocations.map(l=> <option key={l.id} value={l.name}>{l.name} ({money(l.perDiem)}/day)</option>)}
                             </select>
-                            <input className="md:col-span-2 border p-2 rounded" type="number" min={0} value={loc.days} onChange={(e)=>updateLocationActive(idx, { days: parseInt(e.target.value||'0',10) })} />
-                            <div className="md:col-span-2 border p-2 rounded bg-gray-50">{money(loc.perDiemRate)}</div>
-                            <div className="md:col-span-1 text-right font-semibold">{money(loc.totalPerDiem)}</div>
+                            <input className="md:col-span-3 border p-2 rounded" type="number" min={0} value={loc.days} onChange={(e)=>updateLocationActive(idx, { days: parseInt(e.target.value||'0',10) })} />
                             <button onClick={()=>removeLocationActive(loc.id)} className="md:col-span-1 justify-self-end text-red-600">Remove</button>
                           </div>
                         ))}
                         <button className="px-3 py-1 bg-primary text-white rounded" onClick={addLocationActive}>+ Add Location</button>
+
+                        <div className="pt-4 border-t">
+                          <h4 className="text-md font-semibold mb-2 flex items-center gap-2"><Plane className="w-4 h-4" /> Flights</h4>
+                          {(active.flights || []).map((f: any, idx: number) => (
+                            <div key={f.id} className="grid grid-cols-1 md:grid-cols-7 gap-2 border rounded p-2 mb-2">
+                              <input className="border p-2 rounded" placeholder="From" value={f.from || ''} onChange={(e)=>patchActiveTraveler({ flights: (active.flights || []).map((x:any,i:number)=> i===idx ? { ...x, from: e.target.value } : x) })} />
+                              <input className="border p-2 rounded" placeholder="To" value={f.to || ''} onChange={(e)=>patchActiveTraveler({ flights: (active.flights || []).map((x:any,i:number)=> i===idx ? { ...x, to: e.target.value } : x) })} />
+                              <input type="date" className="border p-2 rounded" value={f.date || ''} onChange={(e)=>patchActiveTraveler({ flights: (active.flights || []).map((x:any,i:number)=> i===idx ? { ...x, date: e.target.value } : x) })} />
+                              <input className="border p-2 rounded" placeholder="Flight # (optional)" value={f.flightNumber || ''} onChange={(e)=>patchActiveTraveler({ flights: (active.flights || []).map((x:any,i:number)=> i===idx ? { ...x, flightNumber: e.target.value } : x) })} />
+                              <input className="border p-2 rounded" placeholder="Airline Pref. (optional)" value={f.airline || ''} onChange={(e)=>patchActiveTraveler({ flights: (active.flights || []).map((x:any,i:number)=> i===idx ? { ...x, airline: e.target.value } : x) })} />
+                              <select className="border p-2 rounded" value={f.seat || ''} onChange={(e)=>patchActiveTraveler({ flights: (active.flights || []).map((x:any,i:number)=> i===idx ? { ...x, seat: e.target.value } : x) })}>
+                                <option value="">Seat Pref.</option>
+                                <option value="aisle">Aisle</option>
+                                <option value="window">Window</option>
+                                <option value="middle">Middle</option>
+                              </select>
+                              <button onClick={()=>patchActiveTraveler({ flights: (active.flights || []).filter((_:any,i:number)=> i!==idx) })} className="text-red-600">Remove</button>
+                            </div>
+                          ))}
+                          <button className="px-3 py-1 bg-primary text-white rounded" onClick={()=>patchActiveTraveler({ flights: [...(active.flights||[]), { id: uid(), from: '', to: '', date: '', flightNumber: '', airline: '', seat: '' }] })}>+ Add Flight</button>
+                        </div>
+
+                        <div className="pt-4">
+                          <h4 className="text-md font-semibold mb-2 flex items-center gap-2"><Bed className="w-4 h-4" /> Hotels</h4>
+                          {(active.hotels || []).map((h: any, idx: number) => (
+                            <div key={h.id} className="grid grid-cols-1 md:grid-cols-6 gap-2 border rounded p-2 mb-2">
+                              <input className="border p-2 rounded" placeholder="Hotel Name" value={h.name || ''} onChange={(e)=>patchActiveTraveler({ hotels: (active.hotels || []).map((x:any,i:number)=> i===idx ? { ...x, name: e.target.value } : x) })} />
+                              <input className="border p-2 rounded" placeholder="City" value={h.city || ''} onChange={(e)=>patchActiveTraveler({ hotels: (active.hotels || []).map((x:any,i:number)=> i===idx ? { ...x, city: e.target.value } : x) })} />
+                              <input type="date" className="border p-2 rounded" value={h.checkIn || ''} onChange={(e)=>patchActiveTraveler({ hotels: (active.hotels || []).map((x:any,i:number)=> i===idx ? { ...x, checkIn: e.target.value } : x) })} />
+                              <input type="date" className="border p-2 rounded" value={h.checkOut || ''} onChange={(e)=>patchActiveTraveler({ hotels: (active.hotels || []).map((x:any,i:number)=> i===idx ? { ...x, checkOut: e.target.value } : x) })} />
+                              <input className="border p-2 rounded" placeholder="Max Rate / Night" type="number" min={0} value={h.maxRate || ''} onChange={(e)=>patchActiveTraveler({ hotels: (active.hotels || []).map((x:any,i:number)=> i===idx ? { ...x, maxRate: Number(e.target.value) } : x) })} />
+                              <button onClick={()=>patchActiveTraveler({ hotels: (active.hotels || []).filter((_:any,i:number)=> i!==idx) })} className="text-red-600">Remove</button>
+                            </div>
+                          ))}
+                          <button className="px-3 py-1 bg-primary text-white rounded" onClick={()=>patchActiveTraveler({ hotels: [...(active.hotels||[]), { id: uid(), name: '', city: '', checkIn: '', checkOut: '', maxRate: 0 }] })}>+ Add Hotel</button>
+                        </div>
+
+                        <div className="pt-4">
+                          <h4 className="text-md font-semibold mb-2 flex items-center gap-2"><Car className="w-4 h-4" /> Rental Cars</h4>
+                          {(active.rentalCars || []).map((c: any, idx: number) => (
+                            <div key={c.id} className="grid grid-cols-1 md:grid-cols-7 gap-2 border rounded p-2 mb-2">
+                              <input className="border p-2 rounded" placeholder="Pickup Location" value={c.pickup || ''} onChange={(e)=>patchActiveTraveler({ rentalCars: (active.rentalCars || []).map((x:any,i:number)=> i===idx ? { ...x, pickup: e.target.value } : x) })} />
+                              <input className="border p-2 rounded" placeholder="Dropoff Location" value={c.dropoff || ''} onChange={(e)=>patchActiveTraveler({ rentalCars: (active.rentalCars || []).map((x:any,i:number)=> i===idx ? { ...x, dropoff: e.target.value } : x) })} />
+                              <input type="date" className="border p-2 rounded" value={c.pickupDate || ''} onChange={(e)=>patchActiveTraveler({ rentalCars: (active.rentalCars || []).map((x:any,i:number)=> i===idx ? { ...x, pickupDate: e.target.value } : x) })} />
+                              <input type="time" className="border p-2 rounded" value={c.pickupTime || ''} onChange={(e)=>patchActiveTraveler({ rentalCars: (active.rentalCars || []).map((x:any,i:number)=> i===idx ? { ...x, pickupTime: e.target.value } : x) })} />
+                              <input type="date" className="border p-2 rounded" value={c.dropoffDate || ''} onChange={(e)=>patchActiveTraveler({ rentalCars: (active.rentalCars || []).map((x:any,i:number)=> i===idx ? { ...x, dropoffDate: e.target.value } : x) })} />
+                              <input type="time" className="border p-2 rounded" value={c.dropoffTime || ''} onChange={(e)=>patchActiveTraveler({ rentalCars: (active.rentalCars || []).map((x:any,i:number)=> i===idx ? { ...x, dropoffTime: e.target.value } : x) })} />
+                              <button onClick={()=>patchActiveTraveler({ rentalCars: (active.rentalCars || []).filter((_:any,i:number)=> i!==idx) })} className="text-red-600">Remove</button>
+                            </div>
+                          ))}
+                          <button className="px-3 py-1 bg-primary text-white rounded" onClick={()=>patchActiveTraveler({ rentalCars: [...(active.rentalCars||[]), { id: uid(), pickup: '', dropoff: '', pickupDate: '', pickupTime: '', dropoffDate: '', dropoffTime: '' }] })}>+ Add Rental Car</button>
+                        </div>
                       </div>
                     )}
 
